@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegresoFeliz - Formulario de Reserva</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>RegresoFeliz</h1>
+            <p class="subtitle">Complete el formulario para su servicio de transporte</p>
+        </header>
+
+        <form id="reservaForm">
+            <div class="form-group">
+                <label for="nombre">Nombre Completo *</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+
+            <div class="form-group">
+                <label for="correo">Correo Electrónico *</label>
+                <input type="email" id="correo" name="correo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">Número de Teléfono *</label>
+                <input type="tel" id="telefono" name="telefono" required>
+            </div>
+
+            <div class="form-group">
+                <label for="centroEvento">Centro de Evento *</label>
+                <input type="text" id="centroEvento" name="centroEvento" required>
+            </div>
+
+            <div class="form-group">
+                <label for="destinoFinal">Destino Final *</label>
+                <input type="text" id="destinoFinal" name="destinoFinal" required>
+            </div>
+
+            <!-- Mostrar distancia calculada -->
+            <div class="form-group" id="distanciaContainer" style="display: none;">
+                <label>Información de Ruta:</label>
+                <div class="distancia-info">
+                    <div class="info-item">
+                        <span class="info-label">Distancia:</span>
+                        <span id="distanciaKm" class="info-value">-- km</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Duración:</span>
+                        <span id="duracionEstimada" class="info-value">-- min</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Costo:</span>
+                        <span id="costoTotal" class="info-value costo">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mapa con Leaflet y OpenStreetMap -->
+            <div class="form-group">
+                <label>Mapa de Ruta:</label>
+                <div id="map"></div>
+                <div id="sugerencias-origen" class="sugerencias"></div>
+                <div id="sugerencias-destino" class="sugerencias"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="numeroPersonas">Número de Personas *</label>
+                <input type="number" id="numeroPersonas" name="numeroPersonas" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="marcaModelo">Marca y Modelo de Auto *</label>
+                <input type="text" id="marcaModelo" name="marcaModelo" placeholder="Ej: Toyota Corolla 2020" required>
+            </div>
+
+            <div class="form-group">
+                <label for="tipoTransmision">Tipo de Transmisión *</label>
+                <select id="tipoTransmision" name="tipoTransmision" required>
+                    <option value="">Seleccione una opción</option>
+                    <option value="automatico">Automático</option>
+                    <option value="mecanico">Mecánico</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="patente">Patente del Auto *</label>
+                <input type="text" id="patente" name="patente" required>
+            </div>
+
+            <div class="form-group">
+                <label for="seguro">¿Tiene Seguro de Auto? *</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="seguro" value="si" required>
+                        Sí
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="seguro" value="no" required>
+                        No
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Enviar Reserva</button>
+                <button type="reset" class="btn-reset">Limpiar Formulario</button>
+            </div>
+        </form>
+
+        <div id="mensaje" class="mensaje"></div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
