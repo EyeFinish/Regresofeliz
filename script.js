@@ -401,6 +401,24 @@ function configurarActualizacionResumen() {
         document.getElementById('resumen-telefono').textContent = e.target.value || '--';
     });
     
+    // Actualizar segundo teléfono
+    document.getElementById('telefono2').addEventListener('input', function(e) {
+        const valor = e.target.value;
+        const resumenItem = document.getElementById('resumen-telefono2-item');
+        if (valor) {
+            document.getElementById('resumen-telefono2').textContent = valor;
+            resumenItem.style.display = 'flex';
+        } else {
+            document.getElementById('resumen-telefono2').textContent = '--';
+            resumenItem.style.display = 'none';
+        }
+    });
+    
+    // Actualizar hora de presentación
+    document.getElementById('horaPresentacion').addEventListener('change', function(e) {
+        document.getElementById('resumen-hora').textContent = e.target.value || '--';
+    });
+    
     // Actualizar centro de evento
     centroEventoInput.addEventListener('input', function(e) {
         document.getElementById('resumen-origen').textContent = e.target.value || '--';
@@ -442,6 +460,8 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const nombre = document.getElementById('nombre').value;
     const correo = document.getElementById('correo').value;
     const telefono = document.getElementById('telefono').value;
+    const telefono2 = document.getElementById('telefono2').value;
+    const horaPresentacion = document.getElementById('horaPresentacion').value;
     const centroEvento = document.getElementById('centroEvento').value;
     const destinoFinal = document.getElementById('destinoFinal').value;
     const numeroPersonas = document.getElementById('numeroPersonas').value;
@@ -457,7 +477,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const costo = document.getElementById('resumen-costo').textContent;
     
     // Validar campos obligatorios
-    if (!nombre || !correo || !telefono || !centroEvento || !destinoFinal || !numeroPersonas || 
+    if (!nombre || !correo || !telefono || !horaPresentacion || !centroEvento || !destinoFinal || !numeroPersonas || 
         !marcaModelo || !transmision || !patente || !seguro) {
         mostrarMensaje('Por favor, complete todos los campos del formulario', 'error');
         return;
@@ -472,33 +492,29 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         : '';
     
     // Crear mensaje para WhatsApp
-    const mensaje = `🚗 *REGRESOFELIZ - NUEVA RESERVA*
+    const mensaje = `⭐ NUEVA RESERVA – REGRESOFELIZ
 
-👤 *DATOS DEL CLIENTE*
-Nombre: *${nombre}*
-📧 Correo: ${correo}
-📱 Telefono: ${telefono}
+👤 Cliente: ${nombre}
+📧 ${correo}
+📱 ${telefono}${telefono2 ? '\n🚨 Tel. Emergencia: ' + telefono2 : ''}
+⏰ Hora de presentación: ${horaPresentacion}
 
-📍 *INFORMACION DEL VIAJE*
-Origen: ${centroEvento}
-${linkOrigen ? `Ver en mapa: ${linkOrigen}` : ''}
+🚗 Datos del viaje
+* Origen: ${centroEvento}
+* Destino: ${destinoFinal}
+* Distancia: ${distancia}
+* Duración estimada: ${duracion}
+* Pasajeros: ${numeroPersonas}
 
-Destino: ${destinoFinal}
-${linkDestino ? `Ver en mapa: ${linkDestino}` : ''}
+🚘 Vehículo
+* Marca/Modelo: ${marcaModelo}
+* Transmisión: ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}
+* Patente: ${patente.toUpperCase()}
+* Seguro: ${seguro === 'si' ? 'Sí' : 'No'}
 
-Distancia: *${distancia}*
-Duracion: *${duracion}*
-👥 Pasajeros: *${numeroPersonas} persona(s)*
+💰 Costo total: ${costo}
 
-🚙 *DATOS DEL VEHICULO*
-Marca/Modelo: *${marcaModelo}*
-Transmision: *${transmision === 'automatico' ? 'Automatico' : 'Mecanico'}*
-Patente: *${patente.toUpperCase()}*
-Seguro: ${seguro === 'si' ? '✅ Si' : '❌ No'}
-
-💰 *COSTO TOTAL: ${costo}*
-
-_Reserva desde regresofeliz.cl_`;
+Reserva generada desde regresofeliz.cl`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
@@ -506,11 +522,13 @@ _Reserva desde regresofeliz.cl_`;
     // Número de WhatsApp (sin +)
     const numeroWhatsApp = '56956130912';
     
-    // URL de WhatsApp
-    const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`;
-    
     // Detectar si es móvil y usar el método apropiado
     const esMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // URL de WhatsApp (usar api.whatsapp.com para escritorio para mejor compatibilidad con emojis)
+    const urlWhatsApp = esMobile 
+        ? `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`
+        : `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${mensajeCodificado}`;
     
     if (esMobile) {
         // En móvil, redirigir directamente
