@@ -506,8 +506,19 @@ _Reserva desde regresofeliz.cl_`;
     // Número de WhatsApp (sin +)
     const numeroWhatsApp = '56956130912';
     
-    // Abrir WhatsApp
-    window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
+    // URL de WhatsApp
+    const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`;
+    
+    // Detectar si es móvil y usar el método apropiado
+    const esMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (esMobile) {
+        // En móvil, redirigir directamente
+        window.location.href = urlWhatsApp;
+    } else {
+        // En escritorio, abrir en nueva pestaña
+        window.open(urlWhatsApp, '_blank');
+    }
     
     // Mostrar mensaje de confirmación
     mostrarMensaje('Redirigiendo a WhatsApp...', 'success');
