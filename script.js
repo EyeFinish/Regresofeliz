@@ -1,4 +1,30 @@
-// Variables globales para Leaflet y OpenStreetMap
+// MAPBOX CONFIGURATION
+const MAPBOX_TOKEN = 'pk.eyJ1IjoicmVncmVzb2ZlbGl6IiwiYSI6ImNtajNjNXVnMDE1OTMzcHB6ZzBiMWx1dXIifQ.W2JNrM712264cNmKX5a8iw';
+
+// BASE DE DATOS LOCAL - Centros de Eventos y Lugares Populares en Chile
+const LUGARES_PREDEFINIDOS = [
+    // Centros de Eventos - Santiago
+    { nombre: 'Centro de Eventos La Fragua', direccion: 'La Fragua, Colina, Santiago', lat: -33.1867, lon: -70.6782, categoria: 'centro_eventos' },
+    { nombre: 'Centro de Eventos Botánico', direccion: 'Sendero Estero, Peñalolén, Santiago', lat: -33.5089, lon: -70.5128, categoria: 'centro_eventos' },
+    { nombre: 'Centro de Eventos Casona San José', direccion: 'Av. Santa Rosa, La Pintana, Santiago', lat: -33.5856, lon: -70.6344, categoria: 'centro_eventos' },
+    { nombre: 'Espacio Riesco', direccion: 'Av. El Salto 5000, Huechuraba, Santiago', lat: -33.3594, lon: -70.6403, categoria: 'centro_eventos' },
+    { nombre: 'Centro de Eventos Casona Reina Sur', direccion: 'Camino Longitudinal Sur, San Bernardo', lat: -33.6167, lon: -70.7167, categoria: 'centro_eventos' },
+    { nombre: 'Centro de Eventos Punta Cali', direccion: 'Camino El Melocotón, Pirque', lat: -33.6789, lon: -70.5756, categoria: 'centro_eventos' },
+    { nombre: 'Centro de Eventos Santa Martina', direccion: 'Camino Padre Hurtado, Peñaflor', lat: -33.6089, lon: -70.9128, categoria: 'centro_eventos' },
+    { nombre: 'Haras Los Lingues', direccion: 'Camino Los Lingues, Buin', lat: -33.7389, lon: -70.7456, categoria: 'centro_eventos' },
+    { nombre: 'Club Hípico de Santiago', direccion: 'Av. Blanco Encalada 2540, Santiago Centro', lat: -33.4689, lon: -70.6833, categoria: 'centro_eventos' },
+    { nombre: 'Movistar Arena', direccion: 'Av. Beauchef 1204, Santiago', lat: -33.4656, lon: -70.6833, categoria: 'centro_eventos' },
+    
+    // Ubicaciones populares - Santiago
+    { nombre: 'Plaza de Armas', direccion: 'Plaza de Armas, Santiago Centro', lat: -33.4378, lon: -70.6503, categoria: 'plaza' },
+    { nombre: 'Costanera Center', direccion: 'Av. Andrés Bello 2425, Providencia', lat: -33.4183, lon: -70.6067, categoria: 'mall' },
+    { nombre: 'Parque Bicentenario Vitacura', direccion: 'Av. Bicentenario, Vitacura', lat: -33.4000, lon: -70.5833, categoria: 'parque' },
+    { nombre: 'Parque Araucano', direccion: 'Av. Presidente Riesco, Las Condes', lat: -33.4067, lon: -70.5733, categoria: 'parque' },
+    { nombre: 'Estadio Nacional', direccion: 'Av. Grecia 2001, Ñuñoa', lat: -33.4650, lon: -70.6100, categoria: 'estadio' },
+    { nombre: 'Aeropuerto Arturo Merino Benítez', direccion: 'Pudahuel, Santiago', lat: -33.3930, lon: -70.7858, categoria: 'aeropuerto' }
+];
+
+// Variables globales para Leaflet y Mapbox
 let map;
 let origenMarker = null;
 let destinoMarker = null;
@@ -17,6 +43,21 @@ const centroEventoInput = document.getElementById('centroEvento');
 const destinoFinalInput = document.getElementById('destinoFinal');
 const sugerenciasOrigen = document.getElementById('sugerencias-origen');
 const sugerenciasDestino = document.getElementById('sugerencias-destino');
+
+// Splash Screen - Animación de entrada
+window.addEventListener('load', function() {
+    const splashScreen = document.getElementById('splashScreen');
+    
+    // Ocultar splash screen después de 3 segundos
+    setTimeout(() => {
+        splashScreen.classList.add('hide');
+        
+        // Remover del DOM después de la animación
+        setTimeout(() => {
+            splashScreen.remove();
+        }, 800);
+    }, 3000);
+});
 
 // Inicializar mapa Leaflet cuando cargue la página
 document.addEventListener('DOMContentLoaded', function() {
@@ -67,7 +108,7 @@ function configurarToggleMapa() {
     });
 }
 
-// Inicializar el mapa de Leaflet
+// Inicializar el mapa con Mapbox
 function inicializarMapa() {
     // Crear mapa centrado en Santiago, Chile con interacciones desactivadas
     map = L.map('map', {
@@ -80,13 +121,17 @@ function inicializarMapa() {
         zoomControl: true
     }).setView([-33.4489, -70.6693], 12);
     
-    // Agregar capa de OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
+    // Agregar capa de Mapbox (mucho más precisa)
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: '© <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 19,
+        id: 'mapbox/streets-v12',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: MAPBOX_TOKEN
     }).addTo(map);
     
-    console.log('Mapa Leaflet inicializado correctamente');
+    console.log('Mapa Mapbox inicializado correctamente');
 }
 
 // Configurar autocompletado con Nominatim (OpenStreetMap)
@@ -132,16 +177,144 @@ function configurarAutocompletado() {
     });
 }
 
-// Buscar lugares con Nominatim API
+// Buscar lugares - Sistema Híbrido (Base de datos local + Mapbox + Nominatim)
 async function buscarLugar(query, contenedorSugerencias, esOrigen) {
     try {
+        console.log('🔍 Buscando:', query);
+        
+        // PASO 1: Buscar en base de datos local (instantáneo)
+        const resultadosLocales = buscarEnBaseDatosLocal(query);
+        console.log('📦 Resultados locales:', resultadosLocales.length);
+        
+        // PASO 2: Buscar en Mapbox (en paralelo)
+        const promesaMapbox = buscarEnMapbox(query);
+        
+        // Si hay resultados locales, mostrarlos inmediatamente
+        if (resultadosLocales.length > 0) {
+            const resultadosMapbox = await promesaMapbox;
+            const todosCombinados = [...resultadosLocales, ...resultadosMapbox];
+            // Eliminar duplicados por nombre similar
+            const unicos = eliminarDuplicados(todosCombinados);
+            console.log('✅ Total lugares encontrados:', unicos.length);
+            mostrarSugerencias(unicos, contenedorSugerencias, esOrigen);
+            return;
+        }
+        
+        // Si no hay resultados locales, esperar Mapbox
+        const resultadosMapbox = await promesaMapbox;
+        
+        if (resultadosMapbox.length > 0) {
+            console.log('✅ Resultados de Mapbox:', resultadosMapbox.length);
+            mostrarSugerencias(resultadosMapbox, contenedorSugerencias, esOrigen);
+            return;
+        }
+        
+        // PASO 3: Si Mapbox no encuentra nada, usar Nominatim como último recurso
+        console.log('🔄 Usando búsqueda alternativa (Nominatim)...');
+        await buscarLugarNominatim(query, contenedorSugerencias, esOrigen);
+        
+    } catch (error) {
+        console.error('❌ Error en búsqueda:', error);
+        await buscarLugarNominatim(query, contenedorSugerencias, esOrigen);
+    }
+}
+
+// Buscar en base de datos local
+function buscarEnBaseDatosLocal(query) {
+    const queryLower = query.toLowerCase().trim();
+    
+    return LUGARES_PREDEFINIDOS
+        .filter(lugar => {
+            const nombreMatch = lugar.nombre.toLowerCase().includes(queryLower);
+            const direccionMatch = lugar.direccion.toLowerCase().includes(queryLower);
+            return nombreMatch || direccionMatch;
+        })
+        .map(lugar => ({
+            display_name: `${lugar.nombre} - ${lugar.direccion}`,
+            lat: lugar.lat,
+            lon: lugar.lon,
+            nombre: lugar.nombre,
+            esLocal: true // Marcar como resultado local
+        }))
+        .slice(0, 3); // Máximo 3 resultados locales
+}
+
+// Buscar en Mapbox
+async function buscarEnMapbox(query) {
+    try {
+        let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&country=CL&language=es&limit=5&proximity=-70.6693,-33.4489&types=place,address,poi,locality,neighborhood`;
+        
+        let response = await fetch(url);
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error('❌ Token de Mapbox inválido');
+                return [];
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        let data = await response.json();
+        
+        // Si no hay resultados, intentar búsqueda más amplia
+        if (!data.features || data.features.length === 0) {
+            url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&country=CL&language=es&limit=5&proximity=-70.6693,-33.4489`;
+            response = await fetch(url);
+            data = await response.json();
+        }
+        
+        if (!data.features || data.features.length === 0) {
+            return [];
+        }
+        
+        return data.features.map(feature => ({
+            display_name: feature.place_name,
+            lat: feature.center[1],
+            lon: feature.center[0],
+            nombre: feature.text,
+            esLocal: false
+        }));
+        
+    } catch (error) {
+        console.error('Error en Mapbox:', error);
+        return [];
+    }
+}
+
+// Eliminar duplicados por similitud de nombres
+function eliminarDuplicados(lugares) {
+    const vistos = new Set();
+    return lugares.filter(lugar => {
+        const clave = lugar.nombre.toLowerCase().trim();
+        if (vistos.has(clave)) {
+            return false;
+        }
+        vistos.add(clave);
+        return true;
+    });
+}
+
+// Búsqueda alternativa con Nominatim (OpenStreetMap)
+async function buscarLugarNominatim(query, contenedorSugerencias, esOrigen) {
+    try {
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)},Chile&limit=5&addressdetails=1`;
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'RegresoFeliz/1.0'
+            }
+        });
         const lugares = await response.json();
+        
+        console.log('📍 Resultados de Nominatim:', lugares.length);
+        
+        if (lugares.length === 0) {
+            console.log('⚠️ No se encontraron resultados para:', query);
+        }
         
         mostrarSugerencias(lugares, contenedorSugerencias, esOrigen);
     } catch (error) {
-        console.error('Error al buscar lugares:', error);
+        console.error('❌ Error en búsqueda de Nominatim:', error);
+        mostrarSugerencias([], contenedorSugerencias, esOrigen);
     }
 }
 
@@ -158,8 +331,12 @@ function mostrarSugerencias(lugares, contenedor, esOrigen) {
     lugares.forEach(lugar => {
         const div = document.createElement('div');
         div.className = 'sugerencia-item';
+        
+        // Distinguir si es un resultado local o de API
+        const icono = lugar.esLocal ? '⭐' : '📍';
+        
         div.innerHTML = `
-            <div class="sugerencia-nombre">${lugar.display_name.split(',')[0]}</div>
+            <div class="sugerencia-nombre">${icono} ${lugar.display_name.split(',')[0]}</div>
             <div class="sugerencia-direccion">${lugar.display_name}</div>
         `;
         
@@ -215,17 +392,89 @@ function seleccionarLugar(lugar, esOrigen) {
     }
 }
 
-// Calcular y mostrar la ruta usando OSRM (Open Source Routing Machine)
+// Calcular y mostrar la mejor ruta usando Mapbox Directions API
 async function calcularRuta() {
     if (!origenCoords || !destinoCoords) {
         console.log('Esperando ambas ubicaciones...', { origen: !!origenCoords, destino: !!destinoCoords });
         return;
     }
 
-    console.log('Calculando ruta entre:', origenCoords, 'y', destinoCoords);
+    console.log('🗺️ Calculando mejor ruta entre:', origenCoords, 'y', destinoCoords);
 
     try {
-        // Usar OSRM para calcular la ruta
+        // Usar Mapbox Directions API para calcular la mejor ruta
+        // Parámetros:
+        // - driving-traffic: Considera tráfico en tiempo real
+        // - alternatives=true: Muestra rutas alternativas
+        // - steps=true: Instrucciones paso a paso
+        // - geometries=geojson: Formato GeoJSON para el mapa
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${origenCoords.lng},${origenCoords.lat};${destinoCoords.lng},${destinoCoords.lat}?alternatives=false&geometries=geojson&steps=false&overview=full&access_token=${MAPBOX_TOKEN}`;
+        
+        console.log('📡 Solicitando ruta a Mapbox...');
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            console.warn('⚠️ Mapbox Directions no disponible, usando OSRM como fallback...');
+            return await calcularRutaOSRM();
+        }
+        
+        const data = await response.json();
+        
+        if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+            const route = data.routes[0];
+            
+            // Limpiar ruta anterior si existe
+            if (routeLayer) {
+                map.removeLayer(routeLayer);
+            }
+            
+            // Dibujar la mejor ruta en el mapa
+            const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            routeLayer = L.polyline(coordinates, {
+                color: '#667eea',
+                weight: 6,
+                opacity: 0.8,
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(map);
+            
+            // Ajustar vista del mapa para mostrar toda la ruta con padding
+            map.fitBounds(routeLayer.getBounds(), { padding: [80, 80] });
+            
+            // Calcular distancia y duración (Mapbox ya optimiza la ruta)
+            const distanciaKm = (route.distance / 1000).toFixed(2);
+            const duracionMin = Math.round(route.duration / 60);
+            const costoTotal = (PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM)).toLocaleString('es-CL');
+            
+            // Mostrar información de la ruta
+            document.getElementById('distanciaKm').textContent = `${distanciaKm} km`;
+            document.getElementById('duracionEstimada').textContent = `${duracionMin} min`;
+            document.getElementById('costoTotal').textContent = `$${costoTotal}`;
+            document.getElementById('distanciaContainer').style.display = 'block';
+            
+            // Actualizar resumen
+            actualizarResumenRuta(distanciaKm, duracionMin, costoTotal);
+            
+            console.log('✅ Mejor ruta calculada:', { 
+                distancia: distanciaKm + ' km', 
+                duracion: duracionMin + ' min', 
+                costo: '$' + costoTotal 
+            });
+        } else {
+            console.error('❌ No se pudo calcular la ruta');
+            mostrarMensaje('No se pudo calcular la ruta. Verifica las ubicaciones.', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error al calcular ruta con Mapbox:', error);
+        // Fallback a OSRM si Mapbox falla
+        console.log('🔄 Intentando con OSRM...');
+        await calcularRutaOSRM();
+    }
+}
+
+// Calcular ruta con OSRM (Open Source Routing Machine) como fallback
+async function calcularRutaOSRM() {
+    try {
         const url = `https://router.project-osrm.org/route/v1/driving/${origenCoords.lng},${origenCoords.lat};${destinoCoords.lng},${destinoCoords.lat}?overview=full&geometries=geojson`;
         
         const response = await fetch(url);
@@ -263,9 +512,8 @@ async function calcularRuta() {
             // Actualizar resumen
             actualizarResumenRuta(distanciaKm, duracionMin, costoTotal);
             
-            console.log('Ruta calculada exitosamente:', { distanciaKm, duracionMin, costoTotal });
+            console.log('✅ Ruta calculada con OSRM');
         } else {
-            console.error('No se pudo calcular la ruta');
             mostrarMensaje('No se pudo calcular la ruta. Verifica las ubicaciones.', 'error');
         }
     } catch (error) {
@@ -483,13 +731,9 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         return;
     }
     
-    // Crear enlaces de Google Maps para las ubicaciones
-    const linkOrigen = origenCoords 
-        ? `https://www.google.com/maps?q=${origenCoords.lat},${origenCoords.lng}`
-        : '';
-    const linkDestino = destinoCoords 
-        ? `https://www.google.com/maps?q=${destinoCoords.lat},${destinoCoords.lng}`
-        : '';
+    // Obtener nombre corto de ubicaciones (solo primera parte antes de la coma)
+    const origenCorto = centroEvento.split(',')[0].trim();
+    const destinoCorto = destinoFinal.split(',')[0].trim();
     
     // Crear mensaje para WhatsApp
     const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*
@@ -500,8 +744,8 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
 *⏰ Hora de presentación:* ${horaPresentacion}
 
 *🚗 Datos del viaje*
-* *Origen:* ${centroEvento}
-* *Destino:* ${destinoFinal}
+* *Origen:* ${origenCorto}
+* *Destino:* ${destinoCorto}
 * *Distancia:* ${distancia}
 * *Duración estimada:* ${duracion}
 * *Pasajeros:* ${numeroPersonas}
@@ -538,6 +782,6 @@ _Reserva generada desde regresofeliz.cl_`;
         window.open(urlWhatsApp, '_blank');
     }
     
-    // Mostrar mensaje de confirmación
+        // Mostrar mensaje de confirmación
     mostrarMensaje('Redirigiendo a WhatsApp...', 'success');
 });
