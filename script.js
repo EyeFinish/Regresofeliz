@@ -22,12 +22,63 @@ const sugerenciasDestino = document.getElementById('sugerencias-destino');
 document.addEventListener('DOMContentLoaded', function() {
     inicializarMapa();
     configurarAutocompletado();
+    configurarActualizacionResumen();
+    configurarToggleMapa();
 });
+
+// Configurar botón para activar/desactivar mapa
+function configurarToggleMapa() {
+    let mapaActivo = false;
+    const toggleBtn = document.getElementById('toggleMapBtn');
+    const mapDiv = document.getElementById('map');
+    
+    toggleBtn.addEventListener('click', function() {
+        mapaActivo = !mapaActivo;
+        
+        if (mapaActivo) {
+            // Activar interacciones
+            map.dragging.enable();
+            map.scrollWheelZoom.enable();
+            map.doubleClickZoom.enable();
+            map.touchZoom.enable();
+            map.boxZoom.enable();
+            map.keyboard.enable();
+            
+            // Cambiar estilos
+            mapDiv.classList.remove('map-locked');
+            mapDiv.classList.add('map-active');
+            toggleBtn.textContent = '🔒 Bloquear Mapa';
+            toggleBtn.classList.add('map-active-btn');
+        } else {
+            // Desactivar interacciones
+            map.dragging.disable();
+            map.scrollWheelZoom.disable();
+            map.doubleClickZoom.disable();
+            map.touchZoom.disable();
+            map.boxZoom.disable();
+            map.keyboard.disable();
+            
+            // Cambiar estilos
+            mapDiv.classList.remove('map-active');
+            mapDiv.classList.add('map-locked');
+            toggleBtn.textContent = '🔓 Activar Mapa';
+            toggleBtn.classList.remove('map-active-btn');
+        }
+    });
+}
 
 // Inicializar el mapa de Leaflet
 function inicializarMapa() {
-    // Crear mapa centrado en Santiago, Chile
-    map = L.map('map').setView([-33.4489, -70.6693], 12);
+    // Crear mapa centrado en Santiago, Chile con interacciones desactivadas
+    map = L.map('map', {
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        zoomControl: true
+    }).setView([-33.4489, -70.6693], 12);
     
     // Agregar capa de OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -209,6 +260,9 @@ async function calcularRuta() {
             document.getElementById('costoTotal').textContent = `$${costoTotal}`;
             document.getElementById('distanciaContainer').style.display = 'block';
             
+            // Actualizar resumen
+            actualizarResumenRuta(distanciaKm, duracionMin, costoTotal);
+            
             console.log('Ruta calculada exitosamente:', { distanciaKm, duracionMin, costoTotal });
         } else {
             console.error('No se pudo calcular la ruta');
@@ -329,3 +383,53 @@ document.getElementById('telefono').addEventListener('blur', function(e) {
         mostrarMensaje('Formato de teléfono inválido. Use solo números (8-15 dígitos)', 'error');
     }
 });
+
+// Configurar actualización del resumen en tiempo real
+function configurarActualizacionResumen() {
+    // Actualizar nombre
+    document.getElementById('nombre').addEventListener('input', function(e) {
+        document.getElementById('resumen-nombre').textContent = e.target.value || '--';
+    });
+    
+    // Actualizar correo
+    document.getElementById('correo').addEventListener('input', function(e) {
+        document.getElementById('resumen-correo').textContent = e.target.value || '--';
+    });
+    
+    // Actualizar teléfono
+    document.getElementById('telefono').addEventListener('input', function(e) {
+        document.getElementById('resumen-telefono').textContent = e.target.value || '--';
+    });
+    
+    // Actualizar centro de evento
+    centroEventoInput.addEventListener('input', function(e) {
+        document.getElementById('resumen-origen').textContent = e.target.value || '--';
+    });
+    
+    // Actualizar destino final
+    destinoFinalInput.addEventListener('input', function(e) {
+        document.getElementById('resumen-destino').textContent = e.target.value || '--';
+    });
+    
+    // Actualizar vehículo
+    document.getElementById('marcaModelo').addEventListener('input', function(e) {
+        document.getElementById('resumen-vehiculo').textContent = e.target.value || '--';
+    });
+    
+    // Actualizar patente
+    document.getElementById('patente').addEventListener('input', function(e) {
+        document.getElementById('resumen-patente').textContent = e.target.value.toUpperCase() || '--';
+    });
+    
+    // Actualizar personas
+    document.getElementById('numeroPersonas').addEventListener('input', function(e) {
+        document.getElementById('resumen-personas').textContent = e.target.value ? `${e.target.value} persona(s)` : '--';
+    });
+}
+
+// Actualizar resumen con información de ruta
+function actualizarResumenRuta(distanciaKm, duracionMin, costoTotal) {
+    document.getElementById('resumen-distancia').textContent = `${distanciaKm} km`;
+    document.getElementById('resumen-duracion').textContent = `${duracionMin} min`;
+    document.getElementById('resumen-costo').textContent = `$${costoTotal}`;
+}

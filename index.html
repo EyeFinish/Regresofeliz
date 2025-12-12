@@ -11,13 +11,19 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
+    <!-- Header Principal -->
+    <header class="main-header">
+        <img src="logo RegresoFeliz .png" alt="RegresoFeliz Logo" class="logo">
+        <div class="header-text">
             <h1>RegresoFeliz</h1>
             <p class="subtitle">Servicio Profesional de Chofer de Reemplazo - Solicita tu Angelito</p>
-        </header>
+        </div>
+    </header>
 
-        <form id="reservaForm">
+    <!-- Contenedor del Formulario y Resumen -->
+    <div class="form-wrapper">
+        <div class="container">
+            <form id="reservaForm">
             <div class="form-group">
                 <label for="nombre">Nombre Completo *</label>
                 <input type="text" id="nombre" name="nombre" required>
@@ -36,11 +42,13 @@
             <div class="form-group">
                 <label for="centroEvento">Centro de Evento *</label>
                 <input type="text" id="centroEvento" name="centroEvento" required>
+                <div id="sugerencias-origen" class="sugerencias"></div>
             </div>
 
             <div class="form-group">
                 <label for="destinoFinal">Destino Final *</label>
                 <input type="text" id="destinoFinal" name="destinoFinal" required>
+                <div id="sugerencias-destino" class="sugerencias"></div>
             </div>
 
             <!-- Mostrar distancia calculada -->
@@ -65,9 +73,8 @@
             <!-- Mapa con Leaflet y OpenStreetMap -->
             <div class="form-group">
                 <label>Mapa de Ruta:</label>
-                <div id="map"></div>
-                <div id="sugerencias-origen" class="sugerencias"></div>
-                <div id="sugerencias-destino" class="sugerencias"></div>
+                <button type="button" id="toggleMapBtn" class="toggle-map-btn">🔓 Activar Mapa</button>
+                <div id="map" class="map-locked"></div>
             </div>
 
             <div class="form-group">
@@ -116,6 +123,61 @@
 
         <div id="mensaje" class="mensaje"></div>
     </div>
+
+    <!-- Resumen de Reserva -->
+    <div class="resumen-container">
+        <h2 class="resumen-title">📋 Resumen de Reserva</h2>
+        <div class="resumen-content">
+            <div class="resumen-item">
+                <span class="resumen-label">Nombre:</span>
+                <span class="resumen-value" id="resumen-nombre">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Correo:</span>
+                <span class="resumen-value" id="resumen-correo">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Teléfono:</span>
+                <span class="resumen-value" id="resumen-telefono">--</span>
+            </div>
+            <div class="resumen-separator"></div>
+            <div class="resumen-item">
+                <span class="resumen-label">Centro de Evento:</span>
+                <span class="resumen-value" id="resumen-origen">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Destino Final:</span>
+                <span class="resumen-value" id="resumen-destino">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Distancia:</span>
+                <span class="resumen-value" id="resumen-distancia">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Duración:</span>
+                <span class="resumen-value" id="resumen-duracion">--</span>
+            </div>
+            <div class="resumen-separator"></div>
+            <div class="resumen-item">
+                <span class="resumen-label">Vehículo:</span>
+                <span class="resumen-value" id="resumen-vehiculo">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Patente:</span>
+                <span class="resumen-value" id="resumen-patente">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Personas:</span>
+                <span class="resumen-value" id="resumen-personas">--</span>
+            </div>
+            <div class="resumen-separator"></div>
+            <div class="resumen-item resumen-total">
+                <span class="resumen-label">💰 Costo Total:</span>
+                <span class="resumen-value-total" id="resumen-costo">$0</span>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
