@@ -492,29 +492,29 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         : '';
     
     // Crear mensaje para WhatsApp
-    const mensaje = `⭐ NUEVA RESERVA – REGRESOFELIZ
+    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*
 
-👤 Cliente: ${nombre}
-📧 ${correo}
-📱 ${telefono}${telefono2 ? '\n🚨 Tel. Emergencia: ' + telefono2 : ''}
-⏰ Hora de presentación: ${horaPresentacion}
+*👤 Cliente:* ${nombre}
+*📧 Correo:* ${correo}
+*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}
+*⏰ Hora de presentación:* ${horaPresentacion}
 
-🚗 Datos del viaje
-* Origen: ${centroEvento}
-* Destino: ${destinoFinal}
-* Distancia: ${distancia}
-* Duración estimada: ${duracion}
-* Pasajeros: ${numeroPersonas}
+*🚗 Datos del viaje*
+* *Origen:* ${centroEvento}
+* *Destino:* ${destinoFinal}
+* *Distancia:* ${distancia}
+* *Duración estimada:* ${duracion}
+* *Pasajeros:* ${numeroPersonas}
 
-🚘 Vehículo
-* Marca/Modelo: ${marcaModelo}
-* Transmisión: ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}
-* Patente: ${patente.toUpperCase()}
-* Seguro: ${seguro === 'si' ? 'Sí' : 'No'}
+*🚘 Vehículo*
+* *Marca/Modelo:* ${marcaModelo}
+* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}
+* *Patente:* ${patente.toUpperCase()}
+* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}
 
-💰 Costo total: ${costo}
+*💰 Costo total:* ${costo}
 
-Reserva generada desde regresofeliz.cl`;
+_Reserva generada desde regresofeliz.cl_`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
