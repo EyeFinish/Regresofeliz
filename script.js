@@ -433,3 +433,82 @@ function actualizarResumenRuta(distanciaKm, duracionMin, costoTotal) {
     document.getElementById('resumen-duracion').textContent = `${duracionMin} min`;
     document.getElementById('resumen-costo').textContent = `$${costoTotal}`;
 }
+
+// Enviar reserva por WhatsApp
+document.getElementById('reservaForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Recopilar datos del formulario
+    const nombre = document.getElementById('nombre').value;
+    const correo = document.getElementById('correo').value;
+    const telefono = document.getElementById('telefono').value;
+    const centroEvento = document.getElementById('centroEvento').value;
+    const destinoFinal = document.getElementById('destinoFinal').value;
+    const numeroPersonas = document.getElementById('numeroPersonas').value;
+    const marcaModelo = document.getElementById('marcaModelo').value;
+    const transmision = document.getElementById('tipoTransmision').value;
+    const patente = document.getElementById('patente').value;
+    const seguroRadio = document.querySelector('input[name="seguro"]:checked');
+    const seguro = seguroRadio ? seguroRadio.value : '';
+    
+    // Obtener datos de ruta del resumen
+    const distancia = document.getElementById('resumen-distancia').textContent;
+    const duracion = document.getElementById('resumen-duracion').textContent;
+    const costo = document.getElementById('resumen-costo').textContent;
+    
+    // Validar campos obligatorios
+    if (!nombre || !correo || !telefono || !centroEvento || !destinoFinal || !numeroPersonas || 
+        !marcaModelo || !transmision || !patente || !seguro) {
+        mostrarMensaje('Por favor, complete todos los campos del formulario', 'error');
+        return;
+    }
+    
+    // Crear enlaces de Google Maps para las ubicaciones
+    const linkOrigen = origenCoords 
+        ? `https://www.google.com/maps?q=${origenCoords.lat},${origenCoords.lng}`
+        : '';
+    const linkDestino = destinoCoords 
+        ? `https://www.google.com/maps?q=${destinoCoords.lat},${destinoCoords.lng}`
+        : '';
+    
+    // Crear mensaje para WhatsApp
+    const mensaje = `🚗 *REGRESOFELIZ - NUEVA RESERVA*
+
+👤 *DATOS DEL CLIENTE*
+Nombre: *${nombre}*
+📧 Correo: ${correo}
+📱 Telefono: ${telefono}
+
+📍 *INFORMACION DEL VIAJE*
+Origen: ${centroEvento}
+${linkOrigen ? `Ver en mapa: ${linkOrigen}` : ''}
+
+Destino: ${destinoFinal}
+${linkDestino ? `Ver en mapa: ${linkDestino}` : ''}
+
+Distancia: *${distancia}*
+Duracion: *${duracion}*
+👥 Pasajeros: *${numeroPersonas} persona(s)*
+
+🚙 *DATOS DEL VEHICULO*
+Marca/Modelo: *${marcaModelo}*
+Transmision: *${transmision === 'automatico' ? 'Automatico' : 'Mecanico'}*
+Patente: *${patente.toUpperCase()}*
+Seguro: ${seguro === 'si' ? '✅ Si' : '❌ No'}
+
+💰 *COSTO TOTAL: ${costo}*
+
+_Reserva desde regresofeliz.cl_`;
+    
+    // Codificar mensaje para URL
+    const mensajeCodificado = encodeURIComponent(mensaje);
+    
+    // Número de WhatsApp (sin +)
+    const numeroWhatsApp = '56956130912';
+    
+    // Abrir WhatsApp
+    window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
+    
+    // Mostrar mensaje de confirmación
+    mostrarMensaje('Redirigiendo a WhatsApp...', 'success');
+});
