@@ -677,6 +677,11 @@ function configurarActualizacionResumen() {
     document.getElementById('numeroPersonas').addEventListener('input', function(e) {
         document.getElementById('resumen-personas').textContent = e.target.value ? `${e.target.value} persona(s)` : '--';
     });
+    
+    // Actualizar fecha de reserva
+    document.getElementById('fechaReserva').addEventListener('change', function(e) {
+        document.getElementById('resumen-fecha').textContent = e.target.value || '--';
+    });
 }
 
 // Actualizar resumen con información de ruta
@@ -707,6 +712,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const patente = document.getElementById('patente').value;
     const seguroRadio = document.querySelector('input[name="seguro"]:checked');
     const seguro = seguroRadio ? seguroRadio.value : '';
+    const fechaReserva = document.getElementById('fechaReserva').value;
     
     // Obtener datos de ruta solo de variables globales
     const distancia = window._cotizacion_distancia ? window._cotizacion_distancia + ' km' : '';
@@ -725,7 +731,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const destinoCorto = destinoFinal.split(',')[0].trim();
     
     // Crear mensaje para WhatsApp
-    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*\n\n*👤 Cliente:* ${nombre}\n*📧 Correo:* ${correo}\n*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}\n*⏰ Hora de presentación:* ${horaPresentacion}\n\n*🚗 Datos del viaje*\n* *Origen:* ${origenCorto}\n* *Destino:* ${destinoCorto}\n* *Distancia:* ${distancia}\n* *Duración estimada:* ${duracion}\n* *Pasajeros:* ${numeroPersonas}\n\n*🚘 Vehículo*\n* *Marca/Modelo:* ${marcaModelo}\n* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}\n* *Patente:* ${patente.toUpperCase()}\n* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}\n\n*🟢 COTIZACIÓN HECHA*\n*💰 VALOR: ${costo.toUpperCase()}*\n\n_Reserva generada desde regresofeliz.cl_`;
+    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*\n\n*📅 Fecha de reserva:* ${fechaReserva}\n*👤 Cliente:* ${nombre}\n*📧 Correo:* ${correo}\n*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}\n*⏰ Hora de presentación:* ${horaPresentacion}\n\n*🚗 Datos del viaje*\n* *Origen:* ${origenCorto}\n* *Destino:* ${destinoCorto}\n* *Distancia:* ${distancia}\n* *Duración estimada:* ${duracion}\n* *Pasajeros:* ${numeroPersonas}\n\n*🚘 Vehículo*\n* *Marca/Modelo:* ${marcaModelo}\n* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}\n* *Patente:* ${patente.toUpperCase()}\n* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}\n\n*🟢 COTIZACIÓN HECHA*\n*💰 VALOR: ${costo.toUpperCase()}*\n\n_Reserva generada desde regresofeliz.cl_`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
