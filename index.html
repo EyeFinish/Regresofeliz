@@ -210,5 +210,13 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
+    
+    <script>
+// Solo permitir acceso si viene desde inicio.html
+const params = new URLSearchParams(window.location.search);
+if (!params.has('from')) {
+  window.location.href = 'inicio.html';
+}
+</script>
 </body>
 </html>
