@@ -61,7 +61,8 @@
     font-size: 0.95em;
   }
   .form-wrapper {
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: 100%;
     padding: 0;
   }
@@ -112,5 +113,6 @@
     box-shadow: none;
     border-radius: 8px;
     padding: 18px 8px;
+    order: 2;
   }
 }
