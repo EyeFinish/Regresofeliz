@@ -146,4 +146,19 @@
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
+  .main-header .logo {
+    max-width: 80px !important;
+    height: auto !important;
+    margin-bottom: 0 !important;
+  }
+  .main-header h1 {
+    font-size: 1.5em !important;
+    margin-bottom: 2px !important;
+    text-align: left !important;
+  }
+  .main-header .subtitle {
+    font-size: 1em !important;
+    text-align: left !important;
+    margin-bottom: 0 !important;
+  }
 }
