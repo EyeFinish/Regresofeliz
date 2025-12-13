@@ -11,16 +11,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Splash Screen de Entrada -->
-    <div id="splashScreen" class="splash-screen">
-        <div class="splash-content">
-            <img src="logo-regresofeliz.png" alt="RegresoFeliz Logo" class="splash-logo">
-            <h1 class="splash-title">RegresoFeliz</h1>
-            <p class="splash-subtitle">Tu Angelito de Confianza</p>
-            <div class="splash-loader"></div>
-        </div>
-    </div>
-
     <!-- Header Principal -->
     <header class="main-header">
         <img src="logo-regresofeliz.png" alt="RegresoFeliz Logo" class="logo">
@@ -28,6 +18,7 @@
             <h1>RegresoFeliz</h1>
             <p class="subtitle">Servicio Profesional de Chofer de Reemplazo - Solicita tu Angelito</p>
         </div>
+        <button id="btnVolverInicio" class="btn-volver">← Volver al Inicio</button>
     </header>
 
     <!-- Contenedor del Formulario y Resumen -->
@@ -96,21 +87,13 @@
                 <div id="sugerencias-destino" class="sugerencias"></div>
             </div>
 
-            <!-- Mostrar distancia calculada -->
+            <!-- Mostrar solo minutos (duración) -->
             <div class="form-group" id="distanciaContainer" style="display: none;">
-                <label>Información de Ruta:</label>
+                <label>Duración estimada:</label>
                 <div class="distancia-info">
-                    <div class="info-item">
-                        <span class="info-label">Distancia:</span>
-                        <span id="distanciaKm" class="info-value">-- km</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Duración:</span>
+                    <div class="info-item" style="width:100%;text-align:center;">
+                        <span class="info-label">Minutos:</span>
                         <span id="duracionEstimada" class="info-value">-- min</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Costo:</span>
-                        <span id="costoTotal" class="info-value costo">$0</span>
                     </div>
                 </div>
             </div>
@@ -161,7 +144,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-submit">Enviar Reserva</button>
+                <button type="submit" class="btn-submit">Enviar Cotización</button>
                 <button type="reset" class="btn-reset">Limpiar Formulario</button>
             </div>
         </form>
@@ -203,10 +186,6 @@
                 <span class="resumen-value" id="resumen-destino">--</span>
             </div>
             <div class="resumen-item">
-                <span class="resumen-label">Distancia:</span>
-                <span class="resumen-value" id="resumen-distancia">--</span>
-            </div>
-            <div class="resumen-item">
                 <span class="resumen-label">Duración:</span>
                 <span class="resumen-value" id="resumen-duracion">--</span>
             </div>
@@ -222,11 +201,6 @@
             <div class="resumen-item">
                 <span class="resumen-label">Personas:</span>
                 <span class="resumen-value" id="resumen-personas">--</span>
-            </div>
-            <div class="resumen-separator"></div>
-            <div class="resumen-item resumen-total">
-                <span class="resumen-label">💰 Costo Total:</span>
-                <span class="resumen-value-total" id="resumen-costo">$0</span>
             </div>
         </div>
     </div>

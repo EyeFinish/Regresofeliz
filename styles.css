@@ -1,3 +1,11 @@
+@media (min-width: 1200px) {
+    html {
+        font-size: 130%;
+    }
+    .hero-title {
+        font-size: 7em; /* Mantener el tamaño actual del título principal */
+    }
+}
 * {
     margin: 0;
     padding: 0;
@@ -119,6 +127,682 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Página de Inicio */
+.home-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #000000 0%, #0a0a1a 50%, #001a33 100%);
+}
+
+.home-container {
+    max-width: 1200px;
+    text-align: center;
+    animation: fadeInUp 1s ease-out;
+}
+
+.home-logo {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 30px;
+    filter: drop-shadow(0 0 20px rgba(0, 191, 255, 0.6));
+    animation: float 3s ease-in-out infinite;
+}
+
+.home-title {
+    color: #FFFFFF;
+    font-size: 3.5em;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+}
+
+.home-slogan {
+    color: #00BFFF;
+    font-size: 1.8em;
+    margin-bottom: 60px;
+    font-weight: 300;
+}
+
+.home-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.feature-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid #00BFFF;
+    border-radius: 15px;
+    padding: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);
+}
+
+.feature-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.feature-card h3 {
+    color: #00BFFF;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: #CCCCCC;
+    font-size: 1em;
+    line-height: 1.6;
+}
+
+.home-description {
+    background: rgba(0, 191, 255, 0.05);
+    border: 2px solid #00BFFF;
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.home-description h3 {
+    color: #00BFFF;
+    font-size: 2em;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.steps-list {
+    color: #FFFFFF;
+    font-size: 1.2em;
+    line-height: 2;
+    list-style-position: inside;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.steps-list li {
+    margin-bottom: 15px;
+}
+
+.steps-list strong {
+    color: #00BFFF;
+}
+
+.btn-comenzar {
+    background: linear-gradient(135deg, #00BFFF 0%, #0080FF 100%);
+    color: #FFFFFF;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 20px 50px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0, 191, 255, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-comenzar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(0, 191, 255, 0.6);
+}
+
+.btn-comenzar .arrow {
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.btn-comenzar:hover .arrow {
+    transform: translateX(10px);
+}
+
+.btn-volver {
+    background: rgba(0, 191, 255, 0.2);
+    color: #00BFFF;
+    border: 2px solid #00BFFF;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+.btn-volver:hover {
+    background: #00BFFF;
+    color: #FFFFFF;
+}
+
+/* === NUEVA LANDING PAGE === */
+
+.landing-page {
+    width: 100%;
+    margin: 0;
+    background: #000000;
+    padding: 0;
+    box-sizing: border-box;
+}
+.landing-page {
+    width: 100%;
+    margin: 0;
+    background: #000000;
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #000000 0%, #0a0a1a 50%, #001a33 100%);
+}
+
+.hero-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 30px;
+    filter: drop-shadow(0 0 20px rgba(0, 191, 255, 0.6));
+    animation: float 3s ease-in-out infinite;
+}
+
+@media (min-width: 1200px) {
+    .hero-logo {
+        width: 220px;
+        height: 220px;
+        margin-bottom: 40px;
+        filter: drop-shadow(0 0 30px rgba(0, 191, 255, 0.7));
+    }
+}
+
+.hero-title {
+    color: #FFFFFF;
+    font-size: 7em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    text-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+}
+
+.hero-subtitle {
+    color: #CCCCCC;
+    font-size: 1.5em;
+    margin-bottom: 40px;
+    max-width: 700px;
+}
+
+.hero-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 40px 0;
+    font-size: 1.3em;
+    color: #00BFFF;
+}
+
+.hero-benefits li {
+    margin: 15px 0;
+    font-weight: 500;
+}
+
+.cta-primary {
+    background: linear-gradient(135deg, #00BFFF 0%, #0080FF 100%);
+    color: #FFFFFF;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 20px 50px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0, 191, 255, 0.4);
+    margin-top: 20px;
+}
+
+.cta-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(0, 191, 255, 0.6);
+}
+
+/* Info Section */
+.info-section {
+    padding: 80px 20px;
+    text-align: center;
+    background: #0a0a0a;
+}
+
+.info-section h2 {
+    color: #00BFFF;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+.section-text {
+    color: #CCCCCC;
+    font-size: 1.2em;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto 20px;
+}
+
+.section-text.highlight {
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: 1.3em;
+    margin-top: 30px;
+}
+
+/* Casos Section */
+.casos-section {
+    padding: 80px 20px;
+    text-align: center;
+    background: #000000;
+}
+
+.casos-section h2 {
+    color: #00BFFF;
+    font-size: 2.5em;
+    margin-bottom: 50px;
+}
+
+.casos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+    .home-container {
+        width: 100%;
+        text-align: center;
+        animation: fadeInUp 1s ease-out;
+    }
+.caso-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid #00BFFF;
+    border-radius: 15px;
+    padding: 30px 20px;
+    transition: all 0.3s ease;
+}
+
+.caso-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);
+}
+
+.caso-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.caso-card p {
+    color: #FFFFFF;
+    font-size: 1.1em;
+    line-height: 1.5;
+}
+
+/* Proceso Section */
+.proceso-section {
+    padding: 80px 20px;
+    text-align: center;
+    background: #0a0a0a;
+}
+
+.proceso-section h2 {
+    color: #00BFFF;
+    font-size: 2.5em;
+    margin-bottom: 60px;
+}
+
+.proceso-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid #00BFFF;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.step:hover {
+    transform: translateX(10px);
+    box-shadow: 0 5px 20px rgba(0, 191, 255, 0.3);
+}
+
+.step-number {
+    background: linear-gradient(135deg, #00BFFF 0%, #0080FF 100%);
+    color: #FFFFFF;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.step-content h3 {
+    color: #00BFFF;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.step-content p {
+    color: #CCCCCC;
+    font-size: 1.1em;
+}
+
+/* Beneficios Section */
+.beneficios-section {
+    padding: 80px 20px;
+    text-align: center;
+    background: #000000;
+}
+
+.beneficios-section h2 {
+    color: #00BFFF;
+    font-size: 2.5em;
+    margin-bottom: 50px;
+}
+
+.beneficios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.beneficio-item {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid #00BFFF;
+    border-radius: 15px;
+    padding: 40px 20px;
+    transition: all 0.3s ease;
+}
+
+.beneficio-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);
+}
+
+.beneficio-icon {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+.beneficio-item h3 {
+    color: #00BFFF;
+    font-size: 1.4em;
+    margin-bottom: 15px;
+}
+
+.beneficio-item p {
+    color: #CCCCCC;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+/* Eventos Section */
+.eventos-section {
+    padding: 80px 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #0a0a1a 0%, #001a33 100%);
+    border-top: 2px solid #00BFFF;
+    border-bottom: 2px solid #00BFFF;
+}
+
+.eventos-section h2 {
+    color: #00BFFF;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+.eventos-list {
+    max-width: 600px;
+    margin: 40px auto;
+    background: rgba(0, 191, 255, 0.05);
+    border: 2px solid #00BFFF;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.eventos-list h3 {
+    color: #00BFFF;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+.eventos-list ul {
+    list-style: none;
+    padding: 0;
+    color: #FFFFFF;
+    font-size: 1.2em;
+}
+
+.eventos-list ul li {
+    margin: 15px 0;
+}
+
+.cta-secondary {
+    background: rgba(0, 191, 255, 0.2);
+    color: #00BFFF;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 15px 40px;
+    border: 2px solid #00BFFF;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 30px;
+}
+
+.cta-secondary:hover {
+    background: #00BFFF;
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+/* Compromiso Section */
+.compromiso-section {
+    padding: 80px 20px;
+    text-align: center;
+    background: #0a0a0a;
+}
+
+.compromiso-section h2 {
+    color: #00BFFF;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+/* Final CTA Section */
+.final-cta-section {
+    padding: 100px 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #000000 0%, #0a0a1a 50%, #001a33 100%);
+}
+
+.final-cta-section h2 {
+    color: #FFFFFF;
+    font-size: 3em;
+    margin-bottom: 50px;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-whatsapp {
+    background: #25D366;
+    color: #FFFFFF;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(37, 211, 102, 0.3);
+}
+
+.cta-whatsapp:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(37, 211, 102, 0.5);
+}
+
+/* Footer */
+.landing-footer {
+    padding: 60px 20px 40px;
+    text-align: center;
+    background: #000000;
+    border-top: 2px solid #00BFFF;
+}
+
+.footer-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px rgba(0, 191, 255, 0.5));
+}
+
+.footer-brand {
+    color: #00BFFF;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.footer-description {
+    color: #CCCCCC;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+.footer-slogan {
+    color: #FFFFFF;
+    font-size: 1.3em;
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* Responsive para Landing */
+@media (max-width: 768px) {
+    .landing-page {
+        padding: 0 1vw;
+    }
+    .hero-section, .info-section, .casos-section, .proceso-section, .beneficios-section, .compromiso-section, .final-cta-section, .landing-footer {
+        padding: 30px 0 30px 0;
+    }
+    .hero-title {
+        font-size: 1.1em;
+        line-height: 1.2;
+        margin-bottom: 10px;
+    }
+    .hero-subtitle {
+        font-size: 0.95em;
+        line-height: 1.3;
+        margin-bottom: 18px;
+    }
+    .section-text,
+    .section-text.highlight {
+        font-size: 0.95em;
+        margin-bottom: 10px;
+    }
+    .info-section h2,
+    .casos-section h2,
+    .proceso-section h2,
+    .beneficios-section h2,
+    .compromiso-section h2,
+    .final-cta-section h2 {
+        font-size: 1.1em;
+        margin-bottom: 18px;
+    }
+    .caso-card p,
+    .beneficio-item p,
+    .step-content p {
+        font-size: 0.9em;
+    }
+    .casos-grid,
+    .beneficios-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    .step {
+        flex-direction: column;
+        text-align: center;
+        padding: 12px;
+        gap: 10px;
+    }
+    .step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 1em;
+    }
+    .cta-primary, .cta-secondary, .cta-whatsapp {
+        font-size: 0.95em;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+    }
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .footer-logo {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+    }
+    .footer-brand, .footer-description, .footer-slogan {
+        font-size: 0.95em;
+    }
+}
+.btn-volver:hover {
+    background: #00BFFF;
+    color: #FFFFFF;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Ajustes del header cuando se muestra el formulario */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 body {
@@ -639,23 +1323,52 @@ select:focus {
 /* Responsive */
 @media (max-width: 768px) {
     .container {
-        padding: 20px;
+        padding: 10px;
+        max-width: 95vw;
+        width: 100%;
+        font-size: 80%;
     }
-
+    .form-wrapper {
+        grid-template-columns: 1fr;
+        max-width: 100vw;
+        gap: 10px;
+    }
     header h1 {
         font-size: 2em;
     }
-
     .form-actions {
         flex-direction: column;
     }
-
     #map {
         height: 300px;
     }
-
     .distancia-info {
         grid-template-columns: 1fr;
         gap: 10px;
+    }
+    /* Estilos responsive para página de inicio */
+    .home-title {
+        font-size: 2.5em;
+    }
+    .home-slogan {
+        font-size: 1.3em;
+    }
+    .home-features {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .home-description {
+        padding: 25px;
+    }
+    .steps-list {
+        font-size: 1em;
+    }
+    .btn-comenzar {
+        font-size: 1.2em;
+        padding: 15px 30px;
+    }
+    .main-header {
+        flex-direction: column;
+        gap: 15px;
     }
 }

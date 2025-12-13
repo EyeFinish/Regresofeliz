@@ -44,23 +44,17 @@ const destinoFinalInput = document.getElementById('destinoFinal');
 const sugerenciasOrigen = document.getElementById('sugerencias-origen');
 const sugerenciasDestino = document.getElementById('sugerencias-destino');
 
-// Splash Screen - Animación de entrada
-window.addEventListener('load', function() {
-    const splashScreen = document.getElementById('splashScreen');
-    
-    // Ocultar splash screen después de 3 segundos
-    setTimeout(() => {
-        splashScreen.classList.add('hide');
-        
-        // Remover del DOM después de la animación
-        setTimeout(() => {
-            splashScreen.remove();
-        }, 800);
-    }, 3000);
-});
-
-// Inicializar mapa Leaflet cuando cargue la página
+// Botón volver al inicio (solo en index.html)
 document.addEventListener('DOMContentLoaded', function() {
+    const btnVolverInicio = document.getElementById('btnVolverInicio');
+    
+    if (btnVolverInicio) {
+        btnVolverInicio.addEventListener('click', function() {
+            window.location.href = 'inicio.html';
+        });
+    }
+    
+    // Inicializar componentes del formulario
     inicializarMapa();
     configurarAutocompletado();
     configurarActualizacionResumen();
@@ -446,14 +440,10 @@ async function calcularRuta() {
             const duracionMin = Math.round(route.duration / 60);
             const costoTotal = (PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM)).toLocaleString('es-CL');
             
-            // Mostrar información de la ruta
-            document.getElementById('distanciaKm').textContent = `${distanciaKm} km`;
-            document.getElementById('duracionEstimada').textContent = `${duracionMin} min`;
-            document.getElementById('costoTotal').textContent = `$${costoTotal}`;
-            document.getElementById('distanciaContainer').style.display = 'block';
-            
-            // Actualizar resumen
-            actualizarResumenRuta(distanciaKm, duracionMin, costoTotal);
+            // Guardar valores solo en variables globales para WhatsApp
+            window._cotizacion_costo = costoTotal;
+            window._cotizacion_distancia = distanciaKm;
+            window._cotizacion_duracion = duracionMin;
             
             console.log('✅ Mejor ruta calculada:', { 
                 distancia: distanciaKm + ' km', 
@@ -503,14 +493,10 @@ async function calcularRutaOSRM() {
             const duracionMin = Math.round(route.duration / 60);
             const costoTotal = (PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM)).toLocaleString('es-CL');
             
-            // Mostrar información
-            document.getElementById('distanciaKm').textContent = `${distanciaKm} km`;
-            document.getElementById('duracionEstimada').textContent = `${duracionMin} min`;
-            document.getElementById('costoTotal').textContent = `$${costoTotal}`;
-            document.getElementById('distanciaContainer').style.display = 'block';
-            
-            // Actualizar resumen
-            actualizarResumenRuta(distanciaKm, duracionMin, costoTotal);
+            // Guardar valores solo en variables globales para WhatsApp
+            window._cotizacion_costo = costoTotal;
+            window._cotizacion_distancia = distanciaKm;
+            window._cotizacion_duracion = duracionMin;
             
             console.log('✅ Ruta calculada con OSRM');
         } else {
@@ -560,9 +546,9 @@ form.addEventListener('submit', function(event) {
         telefono: document.getElementById('telefono').value.trim(),
         centroEvento: document.getElementById('centroEvento').value.trim(),
         destinoFinal: document.getElementById('destinoFinal').value.trim(),
-        distancia: document.getElementById('distanciaKm').textContent,
-        duracion: document.getElementById('duracionEstimada').textContent,
-        costo: document.getElementById('costoTotal').textContent,
+        distancia: window._cotizacion_distancia ? window._cotizacion_distancia + ' km' : '',
+        duracion: window._cotizacion_duracion ? window._cotizacion_duracion + ' min' : '',
+        costo: window._cotizacion_costo ? '$' + window._cotizacion_costo : '',
         numeroPersonas: document.getElementById('numeroPersonas').value,
         marcaModelo: document.getElementById('marcaModelo').value.trim(),
         tipoTransmision: document.getElementById('tipoTransmision').value,
@@ -695,9 +681,12 @@ function configurarActualizacionResumen() {
 
 // Actualizar resumen con información de ruta
 function actualizarResumenRuta(distanciaKm, duracionMin, costoTotal) {
-    document.getElementById('resumen-distancia').textContent = `${distanciaKm} km`;
-    document.getElementById('resumen-duracion').textContent = `${duracionMin} min`;
-    document.getElementById('resumen-costo').textContent = `$${costoTotal}`;
+    // Esta función ya no actualiza el resumen visual de distancia/costo
+    // Solo se mantiene para compatibilidad si es llamada en otro lugar
+    // Los valores se guardan en variables globales
+    window._cotizacion_costo = costoTotal;
+    window._cotizacion_distancia = distanciaKm;
+    window._cotizacion_duracion = duracionMin;
 }
 
 // Enviar reserva por WhatsApp
@@ -719,10 +708,10 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const seguroRadio = document.querySelector('input[name="seguro"]:checked');
     const seguro = seguroRadio ? seguroRadio.value : '';
     
-    // Obtener datos de ruta del resumen
-    const distancia = document.getElementById('resumen-distancia').textContent;
-    const duracion = document.getElementById('resumen-duracion').textContent;
-    const costo = document.getElementById('resumen-costo').textContent;
+    // Obtener datos de ruta solo de variables globales
+    const distancia = window._cotizacion_distancia ? window._cotizacion_distancia + ' km' : '';
+    const duracion = window._cotizacion_duracion ? window._cotizacion_duracion + ' min' : '';
+    const costo = window._cotizacion_costo ? '$' + window._cotizacion_costo : '';
     
     // Validar campos obligatorios
     if (!nombre || !correo || !telefono || !horaPresentacion || !centroEvento || !destinoFinal || !numeroPersonas || 
@@ -736,29 +725,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const destinoCorto = destinoFinal.split(',')[0].trim();
     
     // Crear mensaje para WhatsApp
-    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*
-
-*👤 Cliente:* ${nombre}
-*📧 Correo:* ${correo}
-*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}
-*⏰ Hora de presentación:* ${horaPresentacion}
-
-*🚗 Datos del viaje*
-* *Origen:* ${origenCorto}
-* *Destino:* ${destinoCorto}
-* *Distancia:* ${distancia}
-* *Duración estimada:* ${duracion}
-* *Pasajeros:* ${numeroPersonas}
-
-*🚘 Vehículo*
-* *Marca/Modelo:* ${marcaModelo}
-* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}
-* *Patente:* ${patente.toUpperCase()}
-* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}
-
-*💰 Costo total:* ${costo}
-
-_Reserva generada desde regresofeliz.cl_`;
+    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*\n\n*👤 Cliente:* ${nombre}\n*📧 Correo:* ${correo}\n*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}\n*⏰ Hora de presentación:* ${horaPresentacion}\n\n*🚗 Datos del viaje*\n* *Origen:* ${origenCorto}\n* *Destino:* ${destinoCorto}\n* *Distancia:* ${distancia}\n* *Duración estimada:* ${duracion}\n* *Pasajeros:* ${numeroPersonas}\n\n*🚘 Vehículo*\n* *Marca/Modelo:* ${marcaModelo}\n* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}\n* *Patente:* ${patente.toUpperCase()}\n* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}\n\n*🟢 COTIZACIÓN HECHA*\n*💰 VALOR: ${costo.toUpperCase()}*\n\n_Reserva generada desde regresofeliz.cl_`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
