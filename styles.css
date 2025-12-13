@@ -1,11 +1,3 @@
-@media (min-width: 1200px) {
-    html {
-        font-size: 130%;
-    }
-    .hero-title {
-        font-size: 7em; /* Mantener el tamaño actual del título principal */
-    }
-}
 * {
     margin: 0;
     padding: 0;
@@ -317,74 +309,23 @@
     animation: float 3s ease-in-out infinite;
 }
 
-@media (min-width: 1200px) {
-    .hero-logo {
-        width: 220px;
-        height: 220px;
-        margin-bottom: 40px;
-        filter: drop-shadow(0 0 30px rgba(0, 191, 255, 0.7));
-    }
+.hero-title, .hero-subtitle {
+  color: #fff !important;
 }
 
 .hero-title {
     color: #FFFFFF;
-    font-size: 7em;
-    font-weight: bold;
-    margin-bottom: 20px;
-    line-height: 1.2;
+    font-size: 3.5em;
+    margin-bottom: 10px;
     text-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
 }
 
 .hero-subtitle {
-    color: #CCCCCC;
-    font-size: 1.5em;
-    margin-bottom: 40px;
-    max-width: 700px;
-}
-
-.hero-benefits {
-    list-style: none;
-    padding: 0;
-    margin: 40px 0;
-    font-size: 1.3em;
-    color: #00BFFF;
-}
-
-.hero-benefits li {
-    margin: 15px 0;
-    font-weight: 500;
-}
-
-.cta-primary {
-    background: linear-gradient(135deg, #00BFFF 0%, #0080FF 100%);
     color: #FFFFFF;
-    font-size: 1.5em;
-    font-weight: bold;
-    padding: 20px 50px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 20px rgba(0, 191, 255, 0.4);
-    margin-top: 20px;
-}
-
-.cta-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 30px rgba(0, 191, 255, 0.6);
-}
-
-/* Info Section */
-.info-section {
-    padding: 80px 20px;
-    text-align: center;
-    background: #0a0a0a;
-}
-
-.info-section h2 {
-    color: #00BFFF;
-    font-size: 2.5em;
+    font-size: 1.2em;
     margin-bottom: 30px;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 0.5s forwards;
 }
 
 .section-text {
@@ -721,14 +662,16 @@
         padding: 30px 0 30px 0;
     }
     .hero-title {
-        font-size: 1.1em;
-        line-height: 1.2;
-        margin-bottom: 10px;
+    color: #fff !important;
+    font-size: 1.1em;
+    line-height: 1.2;
+    margin-bottom: 10px;
     }
     .hero-subtitle {
-        font-size: 0.95em;
-        line-height: 1.3;
-        margin-bottom: 18px;
+    color: #fff !important;
+    font-size: 0.95em;
+    line-height: 1.3;
+    margin-bottom: 18px;
     }
     .section-text,
     .section-text.highlight {
@@ -948,34 +891,6 @@ body {
 }
 
 /* Responsive para header */
-@media (max-width: 768px) {
-    .main-header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    
-    .main-header h1 {
-        text-align: center;
-    }
-    
-    .main-header .subtitle {
-        text-align: center;
-    }
-    
-    .header-text {
-        align-items: center;
-    }
-    
-    .form-wrapper {
-        grid-template-columns: 1fr;
-    }
-    
-    .resumen-container {
-        position: relative;
-        top: 0;
-    }
-}
 
 /* Sección de Información y Confianza */
 .info-section {
@@ -1320,55 +1235,35 @@ select:focus {
     font-size: 1.5em;
 }
 
+/* Botón Cotizar Angelito Ahora */
+.cta-primary {
+  background: linear-gradient(90deg, #00BFFF 0%, #40E0D0 100%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.2em;
+  letter-spacing: 0.5px;
+  border-radius: 32px;
+  box-shadow: 0 4px 24px #00BFFF33;
+  border: none;
+  padding: 18px 36px;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.cta-primary:hover {
+  background: linear-gradient(90deg, #40E0D0 0%, #00BFFF 100%);
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 32px #00BFFF55;
+}
+
 /* Responsive */
-@media (max-width: 768px) {
-    .container {
-        padding: 10px;
-        max-width: 95vw;
-        width: 100%;
-        font-size: 80%;
-    }
-    .form-wrapper {
-        grid-template-columns: 1fr;
-        max-width: 100vw;
-        gap: 10px;
-    }
-    header h1 {
-        font-size: 2em;
-    }
-    .form-actions {
-        flex-direction: column;
-    }
-    #map {
-        height: 300px;
-    }
-    .distancia-info {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    /* Estilos responsive para página de inicio */
-    .home-title {
-        font-size: 2.5em;
-    }
-    .home-slogan {
-        font-size: 1.3em;
-    }
-    .home-features {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    .home-description {
-        padding: 25px;
-    }
-    .steps-list {
-        font-size: 1em;
-    }
-    .btn-comenzar {
-        font-size: 1.2em;
-        padding: 15px 30px;
-    }
-    .main-header {
-        flex-direction: column;
-        gap: 15px;
-    }
+
+h2.info-title, .info-section h2 {
+  color: #fff !important;
+  font-size: 2.5em;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
 }
