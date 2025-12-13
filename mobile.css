@@ -60,4 +60,57 @@
   .footer-brand, .footer-description, .footer-slogan {
     font-size: 0.95em;
   }
+  .form-wrapper {
+    display: block;
+    width: 100%;
+    padding: 0;
+  }
+  .container {
+    width: 100%;
+    padding: 10px 0 0 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  form#reservaForm {
+    width: 100%;
+  }
+  .form-group {
+    width: 100%;
+    margin-bottom: 18px;
+  }
+  .form-group label {
+    font-size: 1em;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    font-size: 1em;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    box-sizing: border-box;
+  }
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .btn-submit, .btn-reset {
+    width: 100%;
+    font-size: 1.1em;
+    padding: 14px;
+    border-radius: 8px;
+  }
+  .resumen-container {
+    position: static;
+    margin-top: 32px;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 8px;
+    padding: 18px 8px;
+  }
 }
