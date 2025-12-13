@@ -926,6 +926,44 @@ select:focus {
     box-shadow: 0 0 5px rgba(0, 191, 255, 0.3);
 }
 
+input[type="date"] {
+    width: 100%;
+    padding: 12px;
+    background: #1a1a1a;
+    color: #FFFFFF;
+    border: 2px solid #00BFFF;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 2px 8px rgba(0,191,255,0.08);
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+}
+input[type="date"]:focus {
+    outline: none;
+    border-color: #00BFFF;
+    box-shadow: 0 0 8px 2px rgba(0,191,255,0.18);
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7) sepia(1) saturate(5) hue-rotate(170deg);
+    cursor: pointer;
+    height: 28px;
+    width: 28px;
+}
+input[type="date"]::-webkit-input-placeholder {
+    color: #aaa;
+}
+input[type="date"]::-moz-placeholder {
+    color: #aaa;
+}
+input[type="date"]:-ms-input-placeholder {
+    color: #aaa;
+}
+input[type="date"]::placeholder {
+    color: #aaa;
+}
+
 .radio-group {
     display: flex;
     gap: 20px;
