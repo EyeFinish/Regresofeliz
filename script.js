@@ -729,7 +729,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         descuento = Math.round(costoOriginal * 0.10);
         costoFinal = costoOriginal - descuento;
         console.log('DEBUG - Descuento:', descuento, 'Costo final:', costoFinal);
-        detalleDescuento = `\n*Precio original:* $${formatearPesos(costoOriginal)}\n*Descuento (10%):* -$${formatearPesos(descuento)}\n*Total:* $${formatearPesos(costoFinal)}`;
+        detalleDescuento = `\n*Precio original: $${formatearPesos(costoOriginal)}*\n*Descuento (10%): -$${formatearPesos(descuento)}*\n*Total: $${formatearPesos(costoFinal)}*`;
     }
     const costo = costoFinal ? '$' + formatearPesos(costoFinal) : '';
     
