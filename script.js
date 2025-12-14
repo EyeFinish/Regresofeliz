@@ -438,8 +438,7 @@ async function calcularRuta() {
             // Calcular distancia y duración (Mapbox ya optimiza la ruta)
             const distanciaKm = (route.distance / 1000).toFixed(2);
             const duracionMin = Math.round(route.duration / 60);
-            const costoTotal = (PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM)).toLocaleString('es-CL');
-            
+            const costoTotal = PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM);
             // Guardar valores solo en variables globales para WhatsApp
             window._cotizacion_costo = costoTotal;
             window._cotizacion_distancia = distanciaKm;
@@ -491,7 +490,7 @@ async function calcularRutaOSRM() {
             // Calcular distancia y duración
             const distanciaKm = (route.distance / 1000).toFixed(2);
             const duracionMin = Math.round(route.duration / 60);
-            const costoTotal = (PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM)).toLocaleString('es-CL');
+            const costoTotal = PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM);
             
             // Guardar valores solo en variables globales para WhatsApp
             window._cotizacion_costo = costoTotal;
@@ -713,11 +712,26 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const seguroRadio = document.querySelector('input[name="seguro"]:checked');
     const seguro = seguroRadio ? seguroRadio.value : '';
     const fechaReserva = document.getElementById('fechaReserva').value;
+    const codigoDescuento = document.getElementById('codigoDescuento').value.trim();
     
-    // Obtener datos de ruta solo de variables globales
-    const distancia = window._cotizacion_distancia ? window._cotizacion_distancia + ' km' : '';
-    const duracion = window._cotizacion_duracion ? window._cotizacion_duracion + ' min' : '';
-    const costo = window._cotizacion_costo ? '$' + window._cotizacion_costo : '';
+    // Formatear valores con separador de miles y sin decimales
+    function formatearPesos(valor) {
+        return Number(valor).toLocaleString('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    // Obtener el costo original como número
+    console.log('DEBUG - Costo antes de redondear:', window._cotizacion_costo);
+    let costoOriginal = Math.round(window._cotizacion_costo || 0);
+    console.log('DEBUG - Costo original redondeado:', costoOriginal);
+    let descuento = 0;
+    let costoFinal = costoOriginal;
+    let detalleDescuento = '';
+    if (codigoDescuento === '123' && costoOriginal > 0) {
+        descuento = Math.round(costoOriginal * 0.10);
+        costoFinal = costoOriginal - descuento;
+        console.log('DEBUG - Descuento:', descuento, 'Costo final:', costoFinal);
+        detalleDescuento = `\n*Precio original:* $${formatearPesos(costoOriginal)}\n*Descuento (10%):* -$${formatearPesos(descuento)}\n*Total:* $${formatearPesos(costoFinal)}`;
+    }
+    const costo = costoFinal ? '$' + formatearPesos(costoFinal) : '';
     
     // Validar campos obligatorios
     if (!nombre || !correo || !telefono || !horaPresentacion || !centroEvento || !destinoFinal || !numeroPersonas || 
@@ -726,12 +740,16 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         return;
     }
     
+    // Obtener datos de ruta solo de variables globales
+    const distancia = window._cotizacion_distancia ? window._cotizacion_distancia + ' km' : '--';
+    const duracion = window._cotizacion_duracion ? window._cotizacion_duracion + ' min' : '--';
+    
     // Obtener nombre corto de ubicaciones (solo primera parte antes de la coma)
     const origenCorto = centroEvento.split(',')[0].trim();
     const destinoCorto = destinoFinal.split(',')[0].trim();
     
     // Crear mensaje para WhatsApp
-    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*\n\n*📅 Fecha de reserva:* ${fechaReserva}\n*👤 Cliente:* ${nombre}\n*📧 Correo:* ${correo}\n*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}\n*⏰ Hora de presentación:* ${horaPresentacion}\n\n*🚗 Datos del viaje*\n* *Origen:* ${origenCorto}\n* *Destino:* ${destinoCorto}\n* *Distancia:* ${distancia}\n* *Duración estimada:* ${duracion}\n* *Pasajeros:* ${numeroPersonas}\n\n*🚘 Vehículo*\n* *Marca/Modelo:* ${marcaModelo}\n* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}\n* *Patente:* ${patente.toUpperCase()}\n* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}\n\n*🟢 COTIZACIÓN HECHA*\n*💰 VALOR: ${costo.toUpperCase()}*\n\n_Reserva generada desde regresofeliz.cl_`;
+    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*\n\n*📅 Fecha de reserva:* ${fechaReserva}\n*👤 Cliente:* ${nombre}\n*📧 Correo:* ${correo}\n*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}\n*⏰ Hora de presentación:* ${horaPresentacion}\n\n*🚗 Datos del viaje*\n* *Origen:* ${origenCorto}\n* *Destino:* ${destinoCorto}\n* *Distancia:* ${distancia}\n* *Duración estimada:* ${duracion}\n* *Pasajeros:* ${numeroPersonas}\n\n*🚘 Vehículo*\n* *Marca/Modelo:* ${marcaModelo}\n* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}\n* *Patente:* ${patente.toUpperCase()}\n* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}\n\n*🟢 COTIZACIÓN HECHA*${detalleDescuento ? detalleDescuento : '\n*💰 VALOR: ' + costo + '*'}\n\n_Reserva generada desde regresofeliz.cl_`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
