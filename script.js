@@ -755,7 +755,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const mensajeCodificado = encodeURIComponent(mensaje);
     
     // Número de WhatsApp (sin +)
-    const numeroWhatsApp = '56956130912';
+    const numeroWhatsApp = '56926974449';
     
     // Detectar si es móvil y usar el método apropiado
     const esMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
