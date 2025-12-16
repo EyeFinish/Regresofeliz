@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', function() {
-            window.location.href = 'inicio.html';
+            window.location.href = 'index.html';
         });
     }
     

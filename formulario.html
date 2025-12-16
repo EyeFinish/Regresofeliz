@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegresoFeliz - Formulario de Reserva</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+    <!-- Header Principal -->
+    <header class="main-header">
+        <img src="assets/logo-regresofeliz.png" alt="RegresoFeliz Logo" class="logo">
+        <div class="header-text">
+            <h1 class="header-title">RegresoFeliz</h1>
+            <p class="subtitle">Servicio Profesional de Chofer de Reemplazo - Solicita tu Angelito</p>
+        </div>
+        <button id="btnVolverInicio" class="btn-volver">← Volver al Inicio</button>
+    </header>
+
+    <!-- Contenedor del Formulario y Resumen -->
+    <div class="form-wrapper">
+        <div class="container">
+            <form id="reservaForm">
+            <div class="form-group">
+                <label for="fechaReserva">Fecha de Reserva *</label>
+                <input type="date" id="fechaReserva" name="fechaReserva" required>
+            </div>
+            <div class="form-group">
+                <label for="nombre">Nombre Completo *</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+
+            <div class="form-group">
+                <label for="correo">Correo Electrónico *</label>
+                <input type="email" id="correo" name="correo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">Número de Teléfono *</label>
+                <input type="tel" id="telefono" name="telefono" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono2">Número de Emergencia</label>
+                <input type="tel" id="telefono2" name="telefono2">
+            </div>
+
+            <div class="form-group">
+                <label for="horaPresentacion">Hora de Presentación *</label>
+                <select id="horaPresentacion" name="horaPresentacion" required>
+                    <option value="">Seleccione una hora</option>
+                    <option value="19:00">19:00</option>
+                    <option value="19:30">19:30</option>
+                    <option value="20:00">20:00</option>
+                    <option value="20:30">20:30</option>
+                    <option value="21:00">21:00</option>
+                    <option value="21:30">21:30</option>
+                    <option value="22:00">22:00</option>
+                    <option value="22:30">22:30</option>
+                    <option value="23:00">23:00</option>
+                    <option value="23:30">23:30</option>
+                    <option value="00:00">00:00</option>
+                    <option value="00:30">00:30</option>
+                    <option value="01:00">01:00</option>
+                    <option value="01:30">01:30</option>
+                    <option value="02:00">02:00</option>
+                    <option value="02:30">02:30</option>
+                    <option value="03:00">03:00</option>
+                    <option value="03:30">03:30</option>
+                    <option value="04:00">04:00</option>
+                    <option value="04:30">04:30</option>
+                    <option value="05:00">05:00</option>
+                    <option value="05:30">05:30</option>
+                    <option value="06:00">06:00</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="centroEvento">Centro de Evento *</label>
+                <input type="text" id="centroEvento" name="centroEvento" required>
+                <div id="sugerencias-origen" class="sugerencias"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="destinoFinal">Destino Final *</label>
+                <input type="text" id="destinoFinal" name="destinoFinal" required>
+                <div id="sugerencias-destino" class="sugerencias"></div>
+            </div>
+
+            <!-- Mostrar solo minutos (duración) -->
+            <div class="form-group" id="distanciaContainer" style="display: none;">
+                <label>Duración estimada:</label>
+                <div class="distancia-info">
+                    <div class="info-item" style="width:100%;text-align:center;">
+                        <span class="info-label">Minutos:</span>
+                        <span id="duracionEstimada" class="info-value">-- min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mapa con Leaflet y OpenStreetMap -->
+            <div class="form-group">
+                <label>Mapa de Ruta:</label>
+                <button type="button" id="toggleMapBtn" class="toggle-map-btn">🔓 Activar Mapa</button>
+                <div id="map" class="map-locked"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="numeroPersonas">Número de Personas *</label>
+                <input type="number" id="numeroPersonas" name="numeroPersonas" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="marcaModelo">Marca y Modelo de Auto *</label>
+                <input type="text" id="marcaModelo" name="marcaModelo" placeholder="Ej: Toyota Corolla 2020" required>
+            </div>
+
+            <div class="form-group">
+                <label for="tipoTransmision">Tipo de Transmisión *</label>
+                <select id="tipoTransmision" name="tipoTransmision" required>
+                    <option value="">Seleccione una opción</option>
+                    <option value="automatico">Automático</option>
+                    <option value="mecanico">Mecánico</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="patente">Patente del Auto *</label>
+                <input type="text" id="patente" name="patente" required>
+            </div>
+
+            <div class="form-group">
+                <label for="seguro">¿Tiene Seguro de Auto? *</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="seguro" value="si" required>
+                        Sí
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="seguro" value="no" required>
+                        No
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="codigoDescuento">Código de Descuento Preferencial</label>
+                <input type="text" id="codigoDescuento" name="codigoDescuento" placeholder="Ingresa tu código aquí">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Enviar Cotización</button>
+                <button type="reset" class="btn-reset">Limpiar Formulario</button>
+            </div>
+        </form>
+
+        <div id="mensaje" class="mensaje"></div>
+    </div>
+
+    <!-- Resumen de Reserva -->
+    <div class="resumen-container">
+        <h2 class="resumen-title">📋 Resumen de Reserva</h2>
+        <div class="resumen-content">
+            <div class="resumen-item">
+                <span class="resumen-label">Fecha de Reserva:</span>
+                <span class="resumen-value" id="resumen-fecha">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Nombre:</span>
+                <span class="resumen-value" id="resumen-nombre">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Correo:</span>
+                <span class="resumen-value" id="resumen-correo">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Teléfono:</span>
+                <span class="resumen-value" id="resumen-telefono">--</span>
+            </div>
+            <div class="resumen-item" id="resumen-telefono2-item" style="display: none;">
+                <span class="resumen-label">Teléfono Emergencia:</span>
+                <span class="resumen-value" id="resumen-telefono2">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Hora de Presentación:</span>
+                <span class="resumen-value" id="resumen-hora">--</span>
+            </div>
+            <div class="resumen-separator"></div>
+            <div class="resumen-item">
+                <span class="resumen-label">Centro de Evento:</span>
+                <span class="resumen-value" id="resumen-origen">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Destino Final:</span>
+                <span class="resumen-value" id="resumen-destino">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Duración:</span>
+                <span class="resumen-value" id="resumen-duracion">--</span>
+            </div>
+            <div class="resumen-separator"></div>
+            <div class="resumen-item">
+                <span class="resumen-label">Vehículo:</span>
+                <span class="resumen-value" id="resumen-vehiculo">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Patente:</span>
+                <span class="resumen-value" id="resumen-patente">--</span>
+            </div>
+            <div class="resumen-item">
+                <span class="resumen-label">Personas:</span>
+                <span class="resumen-value" id="resumen-personas">--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/script.js"></script>
+    
+    <script>
+// Solo permitir acceso si viene desde inicio.html
+const params = new URLSearchParams(window.location.search);
+if (!params.has('from')) {
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>

@@ -8,63 +8,94 @@
   body {
     padding: 0 !important;
     margin: 0 !important;
-    font-size: 1.05em;
+    font-size: 0.95em;
   }
   .landing-page {
-    padding: 0;
+    padding: 0 16px;
   }
   .hero-section {
-    padding: 32px 0 24px 0;
+    padding: 40px 16px 32px 16px;
   }
   .hero-title {
-    font-size: 1.7em !important;
-    line-height: 1.15;
-    margin-bottom: 12px;
+    font-size: 1.5em !important;
+    line-height: 1.3;
+    margin-bottom: 16px;
   }
   .hero-subtitle {
-    font-size: 1.1em !important;
-    margin-bottom: 18px;
+    font-size: 1em !important;
+    line-height: 1.5;
+    margin-bottom: 24px;
   }
   .hero-logo {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 18px;
+    width: 70px;
+    height: 70px;
+    margin-bottom: 20px;
   }
   .cta-primary {
-    font-size: 1em;
-    padding: 12px 18px;
-    border-radius: 24px;
+    font-size: 0.95em;
+    padding: 12px 24px;
+    border-radius: 8px;
   }
   .info-section, .casos-section, .proceso-section, .beneficios-section, .compromiso-section, .final-cta-section {
-    padding: 18px 0;
+    padding: 32px 16px;
+  }
+  .info-section h2, .casos-section h2, .proceso-section h2, .beneficios-section h2, .compromiso-section h2, .final-cta-section h2 {
+    font-size: 1.4em;
+    margin-bottom: 16px;
+  }
+  .section-text {
+    font-size: 0.95em;
+    line-height: 1.6;
+    margin-bottom: 12px;
   }
   .casos-grid, .beneficios-grid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px;
   }
   .caso-card, .beneficio-item {
-    padding: 18px 10px;
+    padding: 16px 12px;
+  }
+  .caso-icon, .beneficio-icon {
+    font-size: 2em;
+    margin-bottom: 8px;
+  }
+  .caso-card p, .beneficio-item p {
+    font-size: 0.9em;
+  }
+  .beneficio-item h3 {
+    font-size: 1em;
+    margin-bottom: 6px;
   }
   .proceso-steps {
-    gap: 18px;
+    gap: 16px;
   }
   .step {
     flex-direction: column;
     text-align: center;
-    padding: 12px 8px;
-    gap: 8px;
+    padding: 16px 12px;
+    gap: 10px;
   }
   .step-number {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1em;
+  }
+  .step h3 {
     font-size: 1em;
+    margin-bottom: 4px;
+  }
+  .step p {
+    font-size: 0.85em;
   }
   .footer-logo {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
   }
-  .footer-brand, .footer-description, .footer-slogan {
-    font-size: 0.95em;
+  .footer-brand {
+    font-size: 1em;
+  }
+  .footer-description, .footer-slogan {
+    font-size: 0.85em;
   }
   .form-wrapper {
     display: flex;
@@ -75,90 +106,96 @@
     box-sizing: border-box;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding: 0 16px !important;
   }
   .container {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    min-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
     box-shadow: none;
-    border-radius: 0;
-    padding: 10px 0 0 0;
+    border-radius: 8px;
+    padding: 16px 12px;
+    margin: 0 !important;
   }
   form#reservaForm {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    min-width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
   }
   .form-group {
     width: 100%;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
   }
   .form-group label {
-    font-size: 1em;
-    margin-bottom: 4px;
+    font-size: 0.95em;
+    margin-bottom: 6px;
     display: block;
   }
   .form-group input,
   .form-group select {
     width: 100%;
-    font-size: 1em;
-    padding: 10px;
-    border-radius: 8px;
+    font-size: 0.95em;
+    padding: 12px;
+    border-radius: 6px;
     border: 1px solid #ccc;
-    margin-top: 2px;
-    margin-bottom: 2px;
     box-sizing: border-box;
   }
   .form-actions {
     flex-direction: column;
-    gap: 10px;
-    margin-top: 18px;
+    gap: 12px;
+    margin-top: 24px;
   }
   .btn-submit, .btn-reset {
     width: 100%;
-    font-size: 1.1em;
+    font-size: 1em;
     padding: 14px;
-    border-radius: 8px;
+    border-radius: 6px;
   }
   .resumen-container {
     position: static;
-    margin-top: 32px;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    min-width: 100vw !important;
-    box-shadow: none;
-    border-radius: 8px;
-    padding: 18px 8px;
-    order: 2;
-  }
-  .form-wrapper,
-  .container,
-  form#reservaForm,
-  .resumen-container {
+    margin-top: 24px;
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    box-sizing: border-box;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    box-shadow: none;
+    border-radius: 8px;
+    padding: 16px 12px;
+    order: 2;
+  }
+  .resumen-title {
+    font-size: 1.2em;
+    margin-bottom: 16px;
+  }
+  .resumen-item {
+    padding: 10px 0;
+    font-size: 0.9em;
+  }
+  .resumen-label {
+    font-size: 0.85em;
+  }
+  .resumen-value {
+    font-size: 0.9em;
+  }
+  .main-header {
+    padding: 16px !important;
   }
   .main-header .logo {
-    max-width: 80px !important;
+    max-width: 70px !important;
     height: auto !important;
     margin-bottom: 0 !important;
   }
   .main-header h1 {
-    font-size: 1.5em !important;
-    margin-bottom: 2px !important;
+    font-size: 1.3em !important;
+    margin-bottom: 4px !important;
     text-align: left !important;
   }
   .main-header .subtitle {
-    font-size: 1em !important;
+    font-size: 0.85em !important;
     text-align: left !important;
     margin-bottom: 0 !important;
   }
+  .main-header .header-text { display: none !important; }
+  .main-header .logo { display: block !important; margin: 0 auto 10px auto !important; }
+  .main-header .btn-volver { display: block !important; margin: 0 auto 10px auto !important; font-size: 0.9em; padding: 10px 16px; }
+  .main-header { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 12px 0 0 0 !important; }
 }
