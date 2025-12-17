@@ -34,7 +34,7 @@ let destinoCoords = null;
 
 // Constantes de precio
 const PRECIO_BASE = 25000;
-const COSTO_POR_KM = 500;
+const COSTO_POR_KM = 600;
 
 // Obtener elementos del DOM
 const form = document.getElementById('reservaForm');
