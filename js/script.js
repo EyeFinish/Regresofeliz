@@ -611,18 +611,14 @@ async function calcularRuta() {
 
     console.log('🗺️ Calculando mejor ruta entre:', origenCoords, 'y', destinoCoords);
     
-    // Construir waypoints incluyendo paradas adicionales
+    // SOLO calcular ruta entre origen y destino (sin paradas para el cálculo de km)
     let waypoints = `${origenCoords.lng},${origenCoords.lat}`;
-    
-    // Agregar paradas adicionales que tengan coordenadas
-    const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
-    paradasValidas.forEach(parada => {
-        waypoints += `;${parada.coords.lng},${parada.coords.lat}`;
-    });
-    
     waypoints += `;${destinoCoords.lng},${destinoCoords.lat}`;
     
-    console.log('🛣️ Waypoints:', waypoints);
+    // Obtener paradas válidas para el costo adicional (no afectan kilómetros)
+    const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
+    
+    console.log('🛣️ Calculando distancia solo entre origen-destino. Paradas adicionales:', paradasValidas.length);
 
     try {
         const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${waypoints}?alternatives=false&geometries=geojson&steps=false&overview=full&access_token=${MAPBOX_TOKEN}`;
@@ -675,11 +671,11 @@ async function calcularRuta() {
             window._cotizacion_costo_paradas = costoParadas;
             
             console.log('✅ Mejor ruta calculada:', { 
-                distancia: distanciaKm + ' km', 
+                distancia: distanciaKm + ' km (solo origen-destino)', 
                 duracion: duracionMin + ' min', 
                 costoBase: '$' + costoBase,
                 paradas: paradasValidas.length,
-                costoParadas: '$' + costoParadas,
+                costoParadas: '$' + costoParadas + ' ($2000 c/u)',
                 costoTotal: '$' + costoTotal 
             });
         } else {
@@ -697,15 +693,12 @@ async function calcularRuta() {
 // Calcular ruta con OSRM (Open Source Routing Machine) como fallback
 async function calcularRutaOSRM() {
     try {
-        // Construir waypoints incluyendo paradas adicionales
+        // SOLO calcular ruta entre origen y destino (sin paradas para el cálculo de km)
         let waypoints = `${origenCoords.lng},${origenCoords.lat}`;
-        
-        const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
-        paradasValidas.forEach(parada => {
-            waypoints += `;${parada.coords.lng},${parada.coords.lat}`;
-        });
-        
         waypoints += `;${destinoCoords.lng},${destinoCoords.lat}`;
+        
+        // Obtener paradas válidas para el costo adicional (no afectan kilómetros)
+        const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
         
         const url = `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson`;
         
