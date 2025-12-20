@@ -1232,3 +1232,104 @@ h2.info-title, .info-section h2 {
   letter-spacing: 0.5px;
   margin-bottom: 24px;
 }
+/* Paradas Adicionales */
+#paradasContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.parada-adicional {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 191, 255, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s;
+}
+
+.parada-adicional:hover {
+    border-color: rgba(0, 191, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.parada-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.parada-numero {
+    color: #00BFFF;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.btn-eliminar-parada {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+    padding: 0;
+}
+
+.btn-eliminar-parada:hover {
+    background: rgba(255, 59, 48, 0.2);
+    border-color: rgba(255, 59, 48, 0.5);
+    transform: scale(1.1);
+}
+
+.input-parada {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    color: #FFFFFF;
+    font-size: 1em;
+    transition: all 0.3s;
+}
+
+.input-parada:focus {
+    outline: none;
+    border-color: #00BFFF;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-agregar-parada {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 191, 255, 0.1);
+    border: 2px dashed rgba(0, 191, 255, 0.3);
+    border-radius: 8px;
+    color: #00BFFF;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-agregar-parada:hover {
+    background: rgba(0, 191, 255, 0.15);
+    border-color: rgba(0, 191, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.sugerencias-parada {
+    position: relative;
+    margin-top: 8px;
+}

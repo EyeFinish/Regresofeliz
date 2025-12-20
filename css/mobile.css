@@ -198,4 +198,32 @@
   .main-header .logo { display: block !important; margin: 0 auto 10px auto !important; }
   .main-header .btn-volver { display: block !important; margin: 0 auto 10px auto !important; font-size: 0.9em; padding: 10px 16px; }
   .main-header { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 12px 0 0 0 !important; }
-}
+  
+  /* Paradas Adicionales - Mobile */
+  .parada-adicional {
+    padding: 12px;
+  }
+  
+  .parada-header {
+    margin-bottom: 8px;
+  }
+  
+  .parada-numero {
+    font-size: 0.9em;
+  }
+  
+  .btn-eliminar-parada {
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+  }
+  
+  .input-parada {
+    font-size: 0.95em;
+    padding: 10px;
+  }
+  
+  .btn-agregar-parada {
+    font-size: 0.95em;
+    padding: 10px;
+  }

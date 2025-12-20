@@ -35,10 +35,13 @@ let destinoMarker = null;
 let routeLayer = null;
 let origenCoords = null;
 let destinoCoords = null;
+let paradasAdicionales = []; // Array para almacenar paradas adicionales
+let paradaMarkers = []; // Array para los marcadores de paradas
 
 // Constantes de precio
 const PRECIO_BASE = 25000;
 const COSTO_POR_KM = 600;
+const COSTO_PARADA_ADICIONAL = 2000;
 
 // Obtener elementos del DOM
 const form = document.getElementById('reservaForm');
@@ -63,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     configurarAutocompletado();
     configurarActualizacionResumen();
     configurarToggleMapa();
+    configurarParadasAdicionales();
 });
 
 // Configurar botón para activar/desactivar mapa
@@ -104,6 +108,214 @@ function configurarToggleMapa() {
             toggleBtn.classList.remove('map-active-btn');
         }
     });
+}
+
+// Configurar paradas adicionales
+function configurarParadasAdicionales() {
+    const btnAgregar = document.getElementById('btnAgregarParada');
+    const paradasContainer = document.getElementById('paradasContainer');
+    
+    btnAgregar.addEventListener('click', function() {
+        const paradaIndex = paradasAdicionales.length;
+        
+        // Crear elemento de parada adicional
+        const paradaDiv = document.createElement('div');
+        paradaDiv.className = 'parada-adicional';
+        paradaDiv.dataset.index = paradaIndex;
+        paradaDiv.innerHTML = `
+            <div class="parada-header">
+                <span class="parada-numero">Parada ${paradaIndex + 1}</span>
+                <button type="button" class="btn-eliminar-parada" data-index="${paradaIndex}">✕</button>
+            </div>
+            <input type="text" class="input-parada" data-index="${paradaIndex}" placeholder="Ingrese dirección de la parada">
+            <div class="sugerencias sugerencias-parada" id="sugerencias-parada-${paradaIndex}"></div>
+        `;
+        
+        paradasContainer.appendChild(paradaDiv);
+        
+        // Agregar objeto de parada al array
+        paradasAdicionales.push({
+            coords: null,
+            direccion: '',
+            marker: null
+        });
+        
+        // Configurar autocompletado para esta parada
+        const inputParada = paradaDiv.querySelector('.input-parada');
+        const sugerenciasParada = paradaDiv.querySelector('.sugerencias-parada');
+        
+        let timeoutParada;
+        inputParada.addEventListener('input', function() {
+            clearTimeout(timeoutParada);
+            const query = this.value.trim();
+            
+            if (query.length < 3) {
+                sugerenciasParada.classList.remove('active');
+                return;
+            }
+            
+            timeoutParada = setTimeout(() => {
+                buscarLugarParada(query, sugerenciasParada, paradaIndex);
+            }, 500);
+        });
+        
+        // Configurar botón eliminar
+        const btnEliminar = paradaDiv.querySelector('.btn-eliminar-parada');
+        btnEliminar.addEventListener('click', function() {
+            eliminarParada(paradaIndex);
+        });
+    });
+}
+
+// Buscar lugar para parada adicional
+async function buscarLugarParada(query, contenedorSugerencias, index) {
+    try {
+        console.log('🔍 Buscando parada:', query);
+        
+        const resultadosLocales = buscarEnBaseDatosLocal(query);
+        const promesaMapbox = buscarEnMapbox(query);
+        
+        if (resultadosLocales.length > 0) {
+            const resultadosMapbox = await promesaMapbox;
+            const todosCombinados = [...resultadosLocales, ...resultadosMapbox];
+            const unicos = eliminarDuplicados(todosCombinados);
+            mostrarSugerenciasParada(unicos, contenedorSugerencias, index);
+            return;
+        }
+        
+        const resultadosMapbox = await promesaMapbox;
+        
+        if (resultadosMapbox.length > 0) {
+            mostrarSugerenciasParada(resultadosMapbox, contenedorSugerencias, index);
+            return;
+        }
+        
+        await buscarLugarNominatimParada(query, contenedorSugerencias, index);
+        
+    } catch (error) {
+        console.error('❌ Error en búsqueda de parada:', error);
+        await buscarLugarNominatimParada(query, contenedorSugerencias, index);
+    }
+}
+
+// Búsqueda con Nominatim para parada
+async function buscarLugarNominatimParada(query, contenedorSugerencias, index) {
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)},Chile&limit=5&addressdetails=1`;
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'RegresoFeliz/1.0'
+            }
+        });
+        const lugares = await response.json();
+        
+        mostrarSugerenciasParada(lugares, contenedorSugerencias, index);
+    } catch (error) {
+        console.error('❌ Error en búsqueda de Nominatim para parada:', error);
+        mostrarSugerenciasParada([], contenedorSugerencias, index);
+    }
+}
+
+// Mostrar sugerencias para parada adicional
+function mostrarSugerenciasParada(lugares, contenedor, index) {
+    contenedor.innerHTML = '';
+    
+    if (lugares.length === 0) {
+        contenedor.innerHTML = '<div class="sugerencia-item">No se encontraron resultados</div>';
+        contenedor.classList.add('active');
+        return;
+    }
+    
+    lugares.forEach(lugar => {
+        const div = document.createElement('div');
+        div.className = 'sugerencia-item';
+        
+        const icono = lugar.esLocal ? '⭐' : '📍';
+        
+        div.innerHTML = `
+            <div class="sugerencia-nombre">${icono} ${lugar.display_name.split(',')[0]}</div>
+            <div class="sugerencia-direccion">${lugar.display_name}</div>
+        `;
+        
+        div.addEventListener('click', () => {
+            seleccionarLugarParada(lugar, index);
+            contenedor.classList.remove('active');
+        });
+        
+        contenedor.appendChild(div);
+    });
+    
+    contenedor.classList.add('active');
+}
+
+// Seleccionar lugar para parada adicional
+function seleccionarLugarParada(lugar, index) {
+    const coords = {
+        lat: parseFloat(lugar.lat),
+        lng: parseFloat(lugar.lon)
+    };
+    
+    // Actualizar datos de la parada
+    paradasAdicionales[index].coords = coords;
+    paradasAdicionales[index].direccion = lugar.display_name;
+    
+    // Actualizar input
+    const inputParada = document.querySelector(`.input-parada[data-index="${index}"]`);
+    if (inputParada) {
+        inputParada.value = lugar.display_name;
+    }
+    
+    // Eliminar marcador anterior si existe
+    if (paradasAdicionales[index].marker) {
+        map.removeLayer(paradasAdicionales[index].marker);
+    }
+    
+    // Agregar marcador al mapa (usar color diferente para paradas)
+    const marker = L.marker([coords.lat, coords.lng], {
+        title: `Parada ${index + 1}`,
+        icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        })
+    }).addTo(map).bindPopup(`Parada ${index + 1}`).openPopup();
+    
+    paradasAdicionales[index].marker = marker;
+    
+    console.log(`Parada ${index + 1} seleccionada:`, lugar.display_name);
+    
+    // Recalcular ruta si hay origen y destino
+    if (origenCoords && destinoCoords) {
+        calcularRuta();
+    }
+}
+
+// Eliminar parada adicional
+function eliminarParada(index) {
+    const paradaDiv = document.querySelector(`.parada-adicional[data-index="${index}"]`);
+    if (paradaDiv) {
+        paradaDiv.remove();
+    }
+    
+    // Eliminar marcador del mapa
+    if (paradasAdicionales[index] && paradasAdicionales[index].marker) {
+        map.removeLayer(paradasAdicionales[index].marker);
+    }
+    
+    // Marcar como eliminada (no eliminar del array para mantener índices)
+    if (paradasAdicionales[index]) {
+        paradasAdicionales[index] = null;
+    }
+    
+    console.log(`Parada ${index + 1} eliminada`);
+    
+    // Recalcular ruta
+    if (origenCoords && destinoCoords) {
+        calcularRuta();
+    }
 }
 
 // Inicializar el mapa con Mapbox
@@ -398,15 +610,22 @@ async function calcularRuta() {
     }
 
     console.log('🗺️ Calculando mejor ruta entre:', origenCoords, 'y', destinoCoords);
+    
+    // Construir waypoints incluyendo paradas adicionales
+    let waypoints = `${origenCoords.lng},${origenCoords.lat}`;
+    
+    // Agregar paradas adicionales que tengan coordenadas
+    const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
+    paradasValidas.forEach(parada => {
+        waypoints += `;${parada.coords.lng},${parada.coords.lat}`;
+    });
+    
+    waypoints += `;${destinoCoords.lng},${destinoCoords.lat}`;
+    
+    console.log('🛣️ Waypoints:', waypoints);
 
     try {
-        // Usar Mapbox Directions API para calcular la mejor ruta
-        // Parámetros:
-        // - driving-traffic: Considera tráfico en tiempo real
-        // - alternatives=true: Muestra rutas alternativas
-        // - steps=true: Instrucciones paso a paso
-        // - geometries=geojson: Formato GeoJSON para el mapa
-        const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${origenCoords.lng},${origenCoords.lat};${destinoCoords.lng},${destinoCoords.lat}?alternatives=false&geometries=geojson&steps=false&overview=full&access_token=${MAPBOX_TOKEN}`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${waypoints}?alternatives=false&geometries=geojson&steps=false&overview=full&access_token=${MAPBOX_TOKEN}`;
         
         console.log('📡 Solicitando ruta a Mapbox...');
         const response = await fetch(url);
@@ -439,19 +658,29 @@ async function calcularRuta() {
             // Ajustar vista del mapa para mostrar toda la ruta con padding
             map.fitBounds(routeLayer.getBounds(), { padding: [80, 80] });
             
-            // Calcular distancia y duración (Mapbox ya optimiza la ruta)
+            // Calcular distancia, duración y costo (incluyendo paradas adicionales)
             const distanciaKm = (route.distance / 1000).toFixed(2);
             const duracionMin = Math.round(route.duration / 60);
-            const costoTotal = PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM);
+            const costoBase = PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM);
+            const costoParadas = paradasValidas.length * COSTO_PARADA_ADICIONAL;
+            const costoSinRedondeo = costoBase + costoParadas;
+            // Redondear hacia abajo al múltiplo de 1000 y restar 10 (ej: 40.878 → 39.990)
+            const costoTotal = Math.floor(costoSinRedondeo / 1000) * 1000 - 10;
+            
             // Guardar valores solo en variables globales para WhatsApp
             window._cotizacion_costo = costoTotal;
             window._cotizacion_distancia = distanciaKm;
             window._cotizacion_duracion = duracionMin;
+            window._cotizacion_num_paradas = paradasValidas.length;
+            window._cotizacion_costo_paradas = costoParadas;
             
             console.log('✅ Mejor ruta calculada:', { 
                 distancia: distanciaKm + ' km', 
                 duracion: duracionMin + ' min', 
-                costo: '$' + costoTotal 
+                costoBase: '$' + costoBase,
+                paradas: paradasValidas.length,
+                costoParadas: '$' + costoParadas,
+                costoTotal: '$' + costoTotal 
             });
         } else {
             console.error('❌ No se pudo calcular la ruta');
@@ -468,7 +697,17 @@ async function calcularRuta() {
 // Calcular ruta con OSRM (Open Source Routing Machine) como fallback
 async function calcularRutaOSRM() {
     try {
-        const url = `https://router.project-osrm.org/route/v1/driving/${origenCoords.lng},${origenCoords.lat};${destinoCoords.lng},${destinoCoords.lat}?overview=full&geometries=geojson`;
+        // Construir waypoints incluyendo paradas adicionales
+        let waypoints = `${origenCoords.lng},${origenCoords.lat}`;
+        
+        const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
+        paradasValidas.forEach(parada => {
+            waypoints += `;${parada.coords.lng},${parada.coords.lat}`;
+        });
+        
+        waypoints += `;${destinoCoords.lng},${destinoCoords.lat}`;
+        
+        const url = `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson`;
         
         const response = await fetch(url);
         const data = await response.json();
@@ -491,15 +730,21 @@ async function calcularRutaOSRM() {
             // Ajustar vista del mapa para mostrar toda la ruta
             map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
             
-            // Calcular distancia y duración
+            // Calcular distancia, duración y costo (incluyendo paradas adicionales)
             const distanciaKm = (route.distance / 1000).toFixed(2);
             const duracionMin = Math.round(route.duration / 60);
-            const costoTotal = PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM);
+            const costoBase = PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM);
+            const costoParadas = paradasValidas.length * COSTO_PARADA_ADICIONAL;
+            const costoSinRedondeo = costoBase + costoParadas;
+            // Redondear hacia abajo al múltiplo de 1000 y restar 10 (ej: 40.878 → 39.990)
+            const costoTotal = Math.floor(costoSinRedondeo / 1000) * 1000 - 10;
             
             // Guardar valores solo en variables globales para WhatsApp
             window._cotizacion_costo = costoTotal;
             window._cotizacion_distancia = distanciaKm;
             window._cotizacion_duracion = duracionMin;
+            window._cotizacion_num_paradas = paradasValidas.length;
+            window._cotizacion_costo_paradas = costoParadas;
             
             console.log('✅ Ruta calculada con OSRM');
         } else {
@@ -591,11 +836,25 @@ form.addEventListener('submit', function(event) {
         if (destinoMarker) map.removeLayer(destinoMarker);
         if (routeLayer) map.removeLayer(routeLayer);
         
+        // Limpiar marcadores de paradas adicionales
+        paradasAdicionales.forEach(parada => {
+            if (parada && parada.marker) {
+                map.removeLayer(parada.marker);
+            }
+        });
+        
         origenMarker = null;
         destinoMarker = null;
         routeLayer = null;
         origenCoords = null;
         destinoCoords = null;
+        paradasAdicionales = [];
+        
+        // Limpiar el contenedor de paradas adicionales
+        const paradasContainer = document.getElementById('paradasContainer');
+        if (paradasContainer) {
+            paradasContainer.innerHTML = '';
+        }
         
         // Resetear vista del mapa
         map.setView([-33.4489, -70.6693], 12);
@@ -729,7 +988,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     let descuento = 0;
     let costoFinal = costoOriginal;
     let detalleDescuento = '';
-    if (codigoDescuento === '123' && costoOriginal > 0) {
+    if ((codigoDescuento === '123' || codigoDescuento.toUpperCase() === 'CONYYJAVIER') && costoOriginal > 0) {
         descuento = Math.round(costoOriginal * 0.10);
         costoFinal = costoOriginal - descuento;
         console.log('DEBUG - Descuento:', descuento, 'Costo final:', costoFinal);
@@ -752,8 +1011,20 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const origenCorto = centroEvento.split(',')[0].trim();
     const destinoCorto = destinoFinal.split(',')[0].trim();
     
+    // Construir información de paradas adicionales
+    const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
+    let infoParadas = '';
+    if (paradasValidas.length > 0) {
+        infoParadas = '\n*🛑 Paradas adicionales:*\n';
+        paradasValidas.forEach((parada, idx) => {
+            const paradaCorta = parada.direccion.split(',')[0].trim();
+            infoParadas += `   ${idx + 1}. ${paradaCorta}\n`;
+        });
+        infoParadas += `   *Costo paradas: $${formatearPesos(window._cotizacion_costo_paradas || 0)}*\n`;
+    }
+    
     // Crear mensaje para WhatsApp
-    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*\n\n*📅 Fecha de reserva:* ${fechaReserva}\n*👤 Cliente:* ${nombre}\n*📧 Correo:* ${correo}\n*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}\n*⏰ Hora de presentación:* ${horaPresentacion}\n\n*🚗 Datos del viaje*\n* *Origen:* ${origenCorto}\n* *Destino:* ${destinoCorto}\n* *Distancia:* ${distancia}\n* *Duración estimada:* ${duracion}\n* *Pasajeros:* ${numeroPersonas}\n\n*🚘 Vehículo*\n* *Marca/Modelo:* ${marcaModelo}\n* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}\n* *Patente:* ${patente.toUpperCase()}\n* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}\n\n*🟢 COTIZACIÓN HECHA*${detalleDescuento ? detalleDescuento : '\n*💰 VALOR: ' + costo + '*'}\n\n_Reserva generada desde regresofeliz.cl_`;
+    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*\n\n*📅 Fecha de reserva:* ${fechaReserva}\n*👤 Cliente:* ${nombre}\n*📧 Correo:* ${correo}\n*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}\n*⏰ Hora de presentación:* ${horaPresentacion}\n\n*🚗 Datos del viaje*\n* *Origen:* ${origenCorto}\n* *Destino:* ${destinoCorto}${infoParadas}\n* *Distancia:* ${distancia}\n* *Duración estimada:* ${duracion}\n* *Pasajeros:* ${numeroPersonas}\n\n*🚘 Vehículo*\n* *Marca/Modelo:* ${marcaModelo}\n* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}\n* *Patente:* ${patente.toUpperCase()}\n* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}\n\n*🟢 COTIZACIÓN HECHA*${detalleDescuento ? detalleDescuento : '\n*💰 VALOR: ' + costo + '*'}\n\n_Reserva generada desde regresofeliz.cl_`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
