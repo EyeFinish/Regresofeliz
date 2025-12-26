@@ -981,7 +981,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     let descuento = 0;
     let costoFinal = costoOriginal;
     let detalleDescuento = '';
-    if ((codigoDescuento === '123' || codigoDescuento.toUpperCase() === 'CONYYJAVIER') && costoOriginal > 0) {
+    if ((codigoDescuento === '123' || codigoDescuento.toUpperCase() === 'CONYYJAVIER' || codigoDescuento.toUpperCase() === 'AGUSTINYCATALINA') && costoOriginal > 0) {
         descuento = Math.round(costoOriginal * 0.10);
         costoFinal = costoOriginal - descuento;
         console.log('DEBUG - Descuento:', descuento, 'Costo final:', costoFinal);
