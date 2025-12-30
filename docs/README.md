@@ -26,10 +26,12 @@ Conductores para profesionales que trabajan largas jornadas y requieren retorno 
 ## ⚡ Características del Formulario
 
 - ✅ Formulario completo con validaciones
-- ✅ Mapa interactivo con Leaflet y OpenStreetMap (100% gratuito)
-- ✅ Autocompletado de direcciones con Nominatim
-- ✅ Cálculo automático de distancia y costo
+- ✅ Mapa interactivo con Leaflet y Mapbox
+- ✅ Autocompletado de direcciones con Mapbox Geocoding
+- ✅ Cálculo automático de distancia y ruta óptima
 - ✅ Precio base de $25.000 + $500 por kilómetro
+- ✅ Integración directa con WhatsApp
+- ✅ Códigos de descuento
 - ✅ Diseño responsive y moderno
 
 ## 🛠️ Tecnologías
@@ -38,25 +40,32 @@ Conductores para profesionales que trabajan largas jornadas y requieren retorno 
 - CSS3
 - JavaScript (Vanilla)
 - Leaflet.js
-- OpenStreetMap
-- Nominatim API
-- OSRM (Open Source Routing Machine)
+- Mapbox API
+- WhatsApp Web API
 
 ## 📦 Instalación
 
 1. Clona este repositorio
 2. Abre `index.html` en tu navegador
-3. ¡Listo! No requiere configuración adicional ni API keys
+3. ¡Listo!
 
 ## 📁 Estructura del Proyecto
 
 ```
 felizregreso/
-├── index.html      # Estructura del formulario
-├── styles.css      # Estilos y diseño
-├── script.js       # Lógica y funcionalidad
-├── .gitignore      # Archivos ignorados por git
-└── README.md       # Este archivo
+├── assets/          # Recursos (imágenes, iconos)
+├── css/             # Estilos CSS
+│   ├── styles.css   # Estilos principales
+│   └── mobile.css   # Estilos responsive
+├── docs/            # Documentación
+│   ├── README.md
+│   └── AGREGAR_LUGARES.md
+├── js/              # JavaScript
+│   └── script.js    # Lógica principal
+├── index.html       # Página de inicio
+├── formulario.html  # Formulario de cotización
+├── CNAME            # Dominio personalizado
+└── package.json     # Información del proyecto
 ```
 
 ## 💻 Uso
