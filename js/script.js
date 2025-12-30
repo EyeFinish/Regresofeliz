@@ -1018,49 +1018,61 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     
     // Crear mensaje para WhatsApp
     // Generar mensaje más natural con variación aleatoria
-    const saludos = ['Hola', '¡Hola!', 'Buenas', 'Hola, ¿cómo estás?'];
+    const saludos = ['Hola 👋', '¡Hola! 😊', 'Buenas 🙌', 'Hola, ¿cómo estás? 👋'];
     const intros = [
-        'necesito cotizar un angelito',
-        'quisiera solicitar un angelito',
-        'me gustaría solicitar el servicio',
-        'requiero contratar un angelito'
+        'necesito cotizar un angelito 🚗',
+        'quisiera solicitar un angelito 🚙',
+        'me gustaría solicitar el servicio 🚗',
+        'requiero contratar un angelito 🚙'
     ];
-    const despedidas = ['Gracias!', 'Saludos', 'Quedo atento', 'Espero tu respuesta'];
+    const despedidas = ['Gracias! 🙏', 'Saludos 👋', 'Quedo atento ✅', 'Espero tu respuesta 😊'];
     
     // Seleccionar variaciones aleatorias
     const saludo = saludos[Math.floor(Math.random() * saludos.length)];
     const intro = intros[Math.floor(Math.random() * intros.length)];
     const despedida = despedidas[Math.floor(Math.random() * despedidas.length)];
     
+    // Convertir hora a formato 12 horas con AM/PM
+    const convertirAMPM = (hora) => {
+        const [horas, minutos] = hora.split(':');
+        let h = parseInt(horas);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return `${h}:${minutos} ${ampm}`;
+    };
+    
+    const horaFormateada = convertirAMPM(horaPresentacion);
+    
     // Crear mensaje más natural y corto
-    let mensaje = `${saludo}, ${intro} para el ${fechaReserva} a las ${horaPresentacion}.\n\n`;
-    mensaje += `*Datos del viaje:*\n`;
-    mensaje += `De: ${origenCorto}\n`;
-    mensaje += `A: ${destinoCorto}\n`;
+    let mensaje = `${saludo}, ${intro} para el *${fechaReserva}* a las *${horaFormateada}*.\n\n`;
+    mensaje += `📍 *Datos del viaje:*\n`;
+    mensaje += `🔵 Origen: *${origenCorto}*\n`;
+    mensaje += `🔴 Destino: *${destinoCorto}*\n`;
     if (infoParadas) {
         mensaje += `${infoParadas}\n`;
     }
-    mensaje += `Distancia: ${distancia}\n`;
-    mensaje += `Personas: ${numeroPersonas}\n\n`;
+    mensaje += `📏 Distancia: *${distancia}*\n`;
+    mensaje += `👥 Personas: *${numeroPersonas}*\n\n`;
     
-    mensaje += `*Vehículo:*\n`;
-    mensaje += `${marcaModelo} - Patente ${patente.toUpperCase()}\n`;
-    mensaje += `Transmisión: ${transmision === 'automatico' ? 'Automática' : 'Mecánica'}\n`;
-    mensaje += `Seguro: ${seguro === 'si' ? 'Sí' : 'No'}\n\n`;
+    mensaje += `🚗 *Vehículo:*\n`;
+    mensaje += `🚙 Modelo: *${marcaModelo}*\n`;
+    mensaje += `🔢 Patente: *${patente.toUpperCase()}*\n`;
+    mensaje += `⚙️ Transmisión: *${transmision === 'automatico' ? 'Automática' : 'Mecánica'}*\n`;
+    mensaje += `🛡️ Seguro: *${seguro === 'si' ? 'Sí' : 'No'}*\n\n`;
     
-    mensaje += `*Mis datos:*\n`;
-    mensaje += `${nombre}\n`;
-    mensaje += `Tel: ${telefono}\n`;
-    mensaje += `Email: ${correo}\n\n`;
+    mensaje += `👤 *Mis datos:*\n`;
+    mensaje += `📛 Nombre: *${nombre}*\n`;
+    mensaje += `📱 Teléfono: *${telefono}*\n`;
+    mensaje += `📧 Email: *${correo}*\n\n`;
     
     if (detalleDescuento) {
-        mensaje += `${detalleDescuento}\n\n`;
+        mensaje += `💰 ${detalleDescuento}\n\n`;
     } else if (costo) {
-        mensaje += `Valor estimado: ${costo}\n\n`;
+        mensaje += `💰 Valor estimado: *${costo}*\n\n`;
     }
     
     mensaje += `${despedida}\n\n`;
-    mensaje += `Cotización desde: https://regresofeliz.com`;
+    mensaje += `🌐 Cotización desde: https://regresofeliz.com`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
