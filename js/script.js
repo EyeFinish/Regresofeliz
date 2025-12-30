@@ -1018,14 +1018,14 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     
     // Crear mensaje para WhatsApp
     // Generar mensaje más natural con variación aleatoria
-    const saludos = ['Hola 👋', '¡Hola! 😊', 'Buenas 🙌', 'Hola, ¿cómo estás? 👋'];
+    const saludos = ['Hola', 'Hola!', 'Buenas', 'Hola, como estas?'];
     const intros = [
-        'necesito cotizar un angelito 🚗',
-        'quisiera solicitar un angelito 🚙',
-        'me gustaría solicitar el servicio 🚗',
-        'requiero contratar un angelito 🚙'
+        'necesito cotizar un angelito',
+        'quisiera solicitar un angelito',
+        'me gustaria solicitar el servicio',
+        'requiero contratar un angelito'
     ];
-    const despedidas = ['Gracias! 🙏', 'Saludos 👋', 'Quedo atento ✅', 'Espero tu respuesta 😊'];
+    const despedidas = ['Gracias!', 'Saludos', 'Quedo atento', 'Espero tu respuesta'];
     
     // Seleccionar variaciones aleatorias
     const saludo = saludos[Math.floor(Math.random() * saludos.length)];
@@ -1043,27 +1043,27 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     
     const horaFormateada = convertirAMPM(horaPresentacion);
     
-    // Crear mensaje más natural y corto
-    let mensaje = `${saludo}, ${intro} para el *${fechaReserva}* a las *${horaFormateada}*.\n\n`;
+    // Crear mensaje más natural y corto con emojis básicos
+    let mensaje = `${saludo} 👋, ${intro} para el *${fechaReserva}* a las *${horaFormateada}* ⏰\n\n`;
     mensaje += `📍 *Datos del viaje:*\n`;
-    mensaje += `🔵 Origen: *${origenCorto}*\n`;
-    mensaje += `🔴 Destino: *${destinoCorto}*\n`;
+    mensaje += `▪️ Origen: *${origenCorto}*\n`;
+    mensaje += `▪️ Destino: *${destinoCorto}*\n`;
     if (infoParadas) {
         mensaje += `${infoParadas}\n`;
     }
-    mensaje += `📏 Distancia: *${distancia}*\n`;
-    mensaje += `👥 Personas: *${numeroPersonas}*\n\n`;
+    mensaje += `▪️ Distancia: *${distancia}* 📏\n`;
+    mensaje += `▪️ Personas: *${numeroPersonas}* 👥\n\n`;
     
-    mensaje += `🚗 *Vehículo:*\n`;
-    mensaje += `🚙 Modelo: *${marcaModelo}*\n`;
-    mensaje += `🔢 Patente: *${patente.toUpperCase()}*\n`;
-    mensaje += `⚙️ Transmisión: *${transmision === 'automatico' ? 'Automática' : 'Mecánica'}*\n`;
-    mensaje += `🛡️ Seguro: *${seguro === 'si' ? 'Sí' : 'No'}*\n\n`;
+    mensaje += `🚗 *Vehiculo:*\n`;
+    mensaje += `▪️ Modelo: *${marcaModelo}*\n`;
+    mensaje += `▪️ Patente: *${patente.toUpperCase()}*\n`;
+    mensaje += `▪️ Transmision: *${transmision === 'automatico' ? 'Automatica' : 'Mecanica'}* ⚙️\n`;
+    mensaje += `▪️ Seguro: *${seguro === 'si' ? 'Si' : 'No'}*\n\n`;
     
     mensaje += `👤 *Mis datos:*\n`;
-    mensaje += `📛 Nombre: *${nombre}*\n`;
-    mensaje += `📱 Teléfono: *${telefono}*\n`;
-    mensaje += `📧 Email: *${correo}*\n\n`;
+    mensaje += `▪️ Nombre: *${nombre}*\n`;
+    mensaje += `▪️ Telefono: *${telefono}* 📱\n`;
+    mensaje += `▪️ Email: *${correo}* 📧\n\n`;
     
     if (detalleDescuento) {
         mensaje += `💰 ${detalleDescuento}\n\n`;
@@ -1071,8 +1071,8 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         mensaje += `💰 Valor estimado: *${costo}*\n\n`;
     }
     
-    mensaje += `${despedida}\n\n`;
-    mensaje += `🌐 Cotización desde: https://regresofeliz.com`;
+    mensaje += `${despedida} ✅\n\n`;
+    mensaje += `🌐 https://regresofeliz.com`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
