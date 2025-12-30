@@ -1059,7 +1059,8 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         mensaje += `Valor estimado: ${costo}\n\n`;
     }
     
-    mensaje += despedida;
+    mensaje += `${despedida}\n\n`;
+    mensaje += `Cotización desde: https://regresofeliz.com`;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
