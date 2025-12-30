@@ -1017,7 +1017,49 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     }
     
     // Crear mensaje para WhatsApp
-    const mensaje = `⭐ *NUEVA RESERVA – REGRESOFELIZ*\n\n*📅 Fecha de reserva:* ${fechaReserva}\n*👤 Cliente:* ${nombre}\n*📧 Correo:* ${correo}\n*📱 Teléfono:* ${telefono}${telefono2 ? '\n*🚨 Tel. Emergencia:* ' + telefono2 : ''}\n*⏰ Hora de presentación:* ${horaPresentacion}\n\n*🚗 Datos del viaje*\n* *Origen:* ${origenCorto}\n* *Destino:* ${destinoCorto}${infoParadas}\n* *Distancia:* ${distancia}\n* *Duración estimada:* ${duracion}\n* *Pasajeros:* ${numeroPersonas}\n\n*🚘 Vehículo*\n* *Marca/Modelo:* ${marcaModelo}\n* *Transmisión:* ${transmision === 'automatico' ? 'Automático' : 'Mecánico'}\n* *Patente:* ${patente.toUpperCase()}\n* *Seguro:* ${seguro === 'si' ? 'Sí' : 'No'}\n\n*🟢 COTIZACIÓN HECHA*${detalleDescuento ? detalleDescuento : '\n*💰 VALOR: ' + costo + '*'}\n\n_Reserva generada desde regresofeliz.cl_`;
+    // Generar mensaje más natural con variación aleatoria
+    const saludos = ['Hola', '¡Hola!', 'Buenas', 'Hola, ¿cómo estás?'];
+    const intros = [
+        'necesito cotizar un angelito',
+        'quisiera solicitar un angelito',
+        'me gustaría solicitar el servicio',
+        'requiero contratar un angelito'
+    ];
+    const despedidas = ['Gracias!', 'Saludos', 'Quedo atento', 'Espero tu respuesta'];
+    
+    // Seleccionar variaciones aleatorias
+    const saludo = saludos[Math.floor(Math.random() * saludos.length)];
+    const intro = intros[Math.floor(Math.random() * intros.length)];
+    const despedida = despedidas[Math.floor(Math.random() * despedidas.length)];
+    
+    // Crear mensaje más natural y corto
+    let mensaje = `${saludo}, ${intro} para el ${fechaReserva} a las ${horaPresentacion}.\n\n`;
+    mensaje += `*Datos del viaje:*\n`;
+    mensaje += `De: ${origenCorto}\n`;
+    mensaje += `A: ${destinoCorto}\n`;
+    if (infoParadas) {
+        mensaje += `${infoParadas}\n`;
+    }
+    mensaje += `Distancia: ${distancia}\n`;
+    mensaje += `Personas: ${numeroPersonas}\n\n`;
+    
+    mensaje += `*Vehículo:*\n`;
+    mensaje += `${marcaModelo} - Patente ${patente.toUpperCase()}\n`;
+    mensaje += `Transmisión: ${transmision === 'automatico' ? 'Automática' : 'Mecánica'}\n`;
+    mensaje += `Seguro: ${seguro === 'si' ? 'Sí' : 'No'}\n\n`;
+    
+    mensaje += `*Mis datos:*\n`;
+    mensaje += `${nombre}\n`;
+    mensaje += `Tel: ${telefono}\n`;
+    mensaje += `Email: ${correo}\n\n`;
+    
+    if (detalleDescuento) {
+        mensaje += `${detalleDescuento}\n\n`;
+    } else if (costo) {
+        mensaje += `Valor estimado: ${costo}\n\n`;
+    }
+    
+    mensaje += despedida;
     
     // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
@@ -1028,7 +1070,7 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     // Detectar si es móvil y usar el método apropiado
     const esMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    // URL de WhatsApp (usar api.whatsapp.com para escritorio para mejor compatibilidad con emojis)
+    // URL de WhatsApp
     const urlWhatsApp = esMobile 
         ? `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`
         : `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${mensajeCodificado}`;
