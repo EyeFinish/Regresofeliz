@@ -1,0 +1,28 @@
+{
+  "name": "regresofeliz-whatsapp",
+  "version": "1.0.0",
+  "description": "Backend para WhatsApp Business API - RegresoFeliz",
+  "main": "server/whatsapp-webhook.js",
+  "scripts": {
+    "start": "node server/whatsapp-webhook.js",
+    "dev": "nodemon server/whatsapp-webhook.js",
+    "test": "node server/whatsapp-webhook.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "business",
+    "api",
+    "webhook",
+    "regresofeliz"
+  ],
+  "author": "RegresoFeliz",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
