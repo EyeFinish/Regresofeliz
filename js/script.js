@@ -1,17 +1,6 @@
 // MAPBOX CONFIGURATION
 const MAPBOX_TOKEN = 'pk.eyJ1IjoicmVncmVzb2ZlbGl6IiwiYSI6ImNtajNjNXVnMDE1OTMzcHB6ZzBiMWx1dXIifQ.W2JNrM712264cNmKX5a8iw';
 
-// Inicializar WhatsApp API
-let whatsappAPI = null;
-
-// Inicializar WhatsApp cuando se cargue la configuración
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof WHATSAPP_CONFIG !== 'undefined' && typeof WhatsAppAPI !== 'undefined') {
-        whatsappAPI = new WhatsAppAPI(WHATSAPP_CONFIG);
-        console.log('✅ WhatsApp API inicializada');
-    }
-});
-
 // BASE DE DATOS LOCAL - Centros de Eventos y Lugares Populares en Chile
 const LUGARES_PREDEFINIDOS = [
     // Centros de Eventos - Santiago
@@ -1044,69 +1033,13 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         ? `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`
         : `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${mensajeCodificado}`;
     
-    // ======== INTEGRACIÓN CON WHATSAPP BUSINESS API ========
-    // Enviar confirmación automática al cliente por WhatsApp
-    if (whatsappAPI && telefono) {
-        mostrarMensaje('📤 Enviando confirmación...', 'info');
-        
-        const datosParaWhatsApp = {
-            nombre: nombre,
-            telefono: telefono, // Importante: incluir el teléfono
-            fecha: fechaReserva,
-            hora: horaPresentacion,
-            origen: origenCorto,
-            destino: destinoCorto,
-            total: costoFinal,
-            paradas: paradasValidas.map(p => p.direccion.split(',')[0].trim())
-        };
-        
-        whatsappAPI.enviarConfirmacionReserva(datosParaWhatsApp)
-            .then(resultado => {
-                if (resultado.success) {
-                    console.log('✅ Confirmación enviada por WhatsApp API:', resultado.messageId);
-                    mostrarMensaje('✅ Confirmación enviada a tu WhatsApp!', 'success');
-                    
-                    // Esperar 2 segundos antes de abrir WhatsApp del negocio
-                    setTimeout(() => {
-                        if (esMobile) {
-                            window.location.href = urlWhatsApp;
-                        } else {
-                            window.open(urlWhatsApp, '_blank');
-                        }
-                    }, 2000);
-                } else {
-                    console.warn('⚠️ No se pudo enviar confirmación automática:', resultado.error);
-                    mostrarMensaje('⚠️ Error al enviar confirmación: ' + resultado.error, 'warning');
-                    
-                    // Abrir WhatsApp del negocio de todas formas
-                    if (esMobile) {
-                        window.location.href = urlWhatsApp;
-                    } else {
-                        window.open(urlWhatsApp, '_blank');
-                    }
-                }
-            })
-            .catch(err => {
-                console.error('❌ Error al enviar confirmación:', err);
-                mostrarMensaje('⚠️ Error de conexión. Redirigiendo...', 'warning');
-                
-                // Abrir WhatsApp del negocio de todas formas
-                if (esMobile) {
-                    window.location.href = urlWhatsApp;
-                } else {
-                    window.open(urlWhatsApp, '_blank');
-                }
-            });
+    // Abrir WhatsApp directamente
+    mostrarMensaje('Redirigiendo a WhatsApp...', 'success');
+    
+    if (esMobile) {
+        window.location.href = urlWhatsApp;
     } else {
-        // Si no hay API configurada, solo abrir WhatsApp del negocio
-        console.log('ℹ️ WhatsApp API no disponible, usando solo wa.me');
-        mostrarMensaje('Redirigiendo a WhatsApp...', 'success');
-        
-        if (esMobile) {
-            window.location.href = urlWhatsApp;
-        } else {
-            window.open(urlWhatsApp, '_blank');
-        }
+        window.open(urlWhatsApp, '_blank');
     }
     // ======================================================
 });
