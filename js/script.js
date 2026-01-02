@@ -25,7 +25,8 @@ const LUGARES_PREDEFINIDOS = [
     { nombre: 'Parque Bicentenario Vitacura', direccion: 'Av. Bicentenario, Vitacura', lat: -33.4000, lon: -70.5833, categoria: 'parque' },
     { nombre: 'Parque Araucano', direccion: 'Av. Presidente Riesco, Las Condes', lat: -33.4067, lon: -70.5733, categoria: 'parque' },
     { nombre: 'Estadio Nacional', direccion: 'Av. Grecia 2001, Ñuñoa', lat: -33.4650, lon: -70.6100, categoria: 'estadio' },
-    { nombre: 'Aeropuerto Arturo Merino Benítez', direccion: 'Pudahuel, Santiago', lat: -33.3930, lon: -70.7858, categoria: 'aeropuerto' }
+    { nombre: 'Aeropuerto Arturo Merino Benítez', direccion: 'Pudahuel, Santiago', lat: -33.3930, lon: -70.7858, categoria: 'aeropuerto' },
+    { nombre: 'Fundo San Miguel de Colina', direccion: 'Fundo San Miguel de Colina, Colina, Santiago', lat: -33.2090564, lon: -70.6948704, categoria: 'centro_eventos' }
 ];
 
 // Variables globales para Leaflet y Mapbox
