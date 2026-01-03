@@ -12,3 +12,7 @@ Thumbs.db
 # Archivos temporales
 *.log
 *.tmp
+
+# Credenciales de Google Cloud (NO SUBIR)
+augmented-clock-*.json
+*service-account*.json
