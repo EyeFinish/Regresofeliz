@@ -354,6 +354,14 @@ function configurarAutocompletado() {
         clearTimeout(timeoutOrigen);
         const query = this.value.trim();
         
+        // Resetear indicador visual cuando el usuario modifica el texto
+        origenCoords = null;
+        const origenStatus = document.getElementById('origenStatus');
+        if (origenStatus) {
+            origenStatus.style.display = 'none';
+        }
+        centroEventoInput.style.borderColor = '';
+        
         if (query.length < 3) {
             sugerenciasOrigen.classList.remove('active');
             return;
@@ -368,6 +376,14 @@ function configurarAutocompletado() {
     destinoFinalInput.addEventListener('input', function() {
         clearTimeout(timeoutDestino);
         const query = this.value.trim();
+        
+        // Resetear indicador visual cuando el usuario modifica el texto
+        destinoCoords = null;
+        const destinoStatus = document.getElementById('destinoStatus');
+        if (destinoStatus) {
+            destinoStatus.style.display = 'none';
+        }
+        destinoFinalInput.style.borderColor = '';
         
         if (query.length < 3) {
             sugerenciasDestino.classList.remove('active');
@@ -573,6 +589,14 @@ function seleccionarLugar(lugar, esOrigen) {
         centroEventoInput.value = lugar.display_name;
         origenCoords = coords;
         
+        // Mostrar indicador visual de éxito
+        const origenStatus = document.getElementById('origenStatus');
+        if (origenStatus) {
+            origenStatus.style.display = 'block';
+            origenStatus.style.color = '#4CAF50';
+        }
+        centroEventoInput.style.borderColor = '#4CAF50';
+        
         // Agregar o actualizar marcador de origen
         if (origenMarker) {
             map.removeLayer(origenMarker);
@@ -581,10 +605,18 @@ function seleccionarLugar(lugar, esOrigen) {
             title: 'Centro de Evento'
         }).addTo(map).bindPopup('Centro de Evento').openPopup();
         
-        console.log('Origen seleccionado:', lugar.display_name);
+        console.log('✅ Origen seleccionado:', lugar.display_name);
     } else {
         destinoFinalInput.value = lugar.display_name;
         destinoCoords = coords;
+        
+        // Mostrar indicador visual de éxito
+        const destinoStatus = document.getElementById('destinoStatus');
+        if (destinoStatus) {
+            destinoStatus.style.display = 'block';
+            destinoStatus.style.color = '#4CAF50';
+        }
+        destinoFinalInput.style.borderColor = '#4CAF50';
         
         // Agregar o actualizar marcador de destino
         if (destinoMarker) {
@@ -594,7 +626,7 @@ function seleccionarLugar(lugar, esOrigen) {
             title: 'Destino Final'
         }).addTo(map).bindPopup('Destino Final').openPopup();
         
-        console.log('Destino seleccionado:', lugar.display_name);
+        console.log('✅ Destino seleccionado:', lugar.display_name);
     }
     
     // Si ambos están seleccionados, calcular ruta
@@ -671,14 +703,17 @@ async function calcularRuta() {
             window._cotizacion_num_paradas = paradasValidas.length;
             window._cotizacion_costo_paradas = costoParadas;
             
-            console.log('✅ Mejor ruta calculada:', { 
+            console.log('✅ ✅ ✅ RUTA Y COSTO CALCULADOS EXITOSAMENTE ✅ ✅ ✅');
+            console.log('📊 Detalles de cotización:', { 
                 distancia: distanciaKm + ' km (solo origen-destino)', 
                 duracion: duracionMin + ' min', 
-                costoBase: '$' + costoBase,
+                costoBase: '$' + costoBase.toLocaleString('es-CL'),
                 paradas: paradasValidas.length,
-                costoParadas: '$' + costoParadas + ' ($2000 c/u)',
-                costoTotal: '$' + costoTotal 
+                costoParadas: '$' + costoParadas.toLocaleString('es-CL') + ' ($2000 c/u)',
+                costoTotal: '$' + costoTotal.toLocaleString('es-CL'),
+                formularioListoParaEnviar: true
             });
+            console.log('✅ window._cotizacion_costo =', window._cotizacion_costo);
         } else {
             console.error('❌ No se pudo calcular la ruta');
             mostrarMensaje('No se pudo calcular la ruta. Verifica las ubicaciones.', 'error');
@@ -740,7 +775,17 @@ async function calcularRutaOSRM() {
             window._cotizacion_num_paradas = paradasValidas.length;
             window._cotizacion_costo_paradas = costoParadas;
             
-            console.log('✅ Ruta calculada con OSRM');
+            console.log('✅ ✅ ✅ RUTA Y COSTO CALCULADOS CON OSRM ✅ ✅ ✅');
+            console.log('📊 Detalles de cotización:', { 
+                distancia: distanciaKm + ' km', 
+                duracion: duracionMin + ' min', 
+                costoBase: '$' + costoBase.toLocaleString('es-CL'),
+                paradas: paradasValidas.length,
+                costoParadas: '$' + costoParadas.toLocaleString('es-CL'),
+                costoTotal: '$' + costoTotal.toLocaleString('es-CL'),
+                formularioListoParaEnviar: true
+            });
+            console.log('✅ window._cotizacion_costo =', window._cotizacion_costo);
         } else {
             mostrarMensaje('No se pudo calcular la ruta. Verifica las ubicaciones.', 'error');
         }
@@ -822,6 +867,7 @@ function ocultarPantallaCarga() {
     if (overlay) {
         overlay.remove();
     }
+    document.body.style.overflow = 'auto';
 }
 
 // Formatear patente automáticamente
@@ -937,8 +983,33 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         return;
     }
     
+    // Validar que se haya calculado la ruta (origen y destino deben estar definidos)
+    if (!origenCoords || !destinoCoords) {
+        mostrarMensaje('⚠️ Por favor, selecciona el origen y destino usando las sugerencias del mapa para calcular el costo del servicio.', 'error');
+        // Resaltar los campos
+        centroEventoInput.style.border = '2px solid #ff4444';
+        destinoFinalInput.style.border = '2px solid #ff4444';
+        setTimeout(() => {
+            centroEventoInput.style.border = '';
+            destinoFinalInput.style.border = '';
+        }, 3000);
+        return;
+    }
+    
     // Calcular costos y descuentos
     let costoOriginal = Math.round(window._cotizacion_costo || 0);
+    
+    // Validar que el costo se haya calculado correctamente
+    if (costoOriginal === 0 || !window._cotizacion_costo) {
+        mostrarMensaje('⚠️ Error al calcular el costo. Por favor, verifica que el origen y destino sean correctos y que la ruta se haya calculado.', 'error');
+        console.error('❌ Costo no calculado. Variables:', {
+            _cotizacion_costo: window._cotizacion_costo,
+            origenCoords,
+            destinoCoords,
+            distancia: window._cotizacion_distancia
+        });
+        return;
+    }
     let descuento = 0;
     let costoFinal = costoOriginal;
     
@@ -1008,18 +1079,13 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         console.log('📊 Resultado del servidor:', resultado);
         console.log('🔍 resultado.ok =', resultado.ok);
         
-        if (resultado.ok) {
-            console.log('✅ Cotización guardada correctamente');
-            console.log('🔄 Ocultando pantalla de carga...');
+        if (resultado.ok === true) {
+            console.log('✅ Cotización guardada correctamente - INICIANDO REDIRECCIÓN');
             
             // Ocultar pantalla de carga
             ocultarPantallaCarga();
             
-            console.log('🎉 REDIRIGIENDO AHORA a cotizacion-exitosa.html');
-            console.log('🌐 URL actual:', window.location.href);
-            console.log('🚀 Ejecutando redirección...');
-            
-            // Redirigir INMEDIATAMENTE
+            // Redirigir inmediatamente
             window.location.href = 'cotizacion-exitosa.html';
         
         } else {

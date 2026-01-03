@@ -82,14 +82,22 @@
 
             <div class="form-group">
                 <label for="centroEvento">Centro de Evento *</label>
-                <input type="text" id="centroEvento" name="centroEvento" required>
+                <div style="position: relative;">
+                    <input type="text" id="centroEvento" name="centroEvento" required>
+                    <span id="origenStatus" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 20px; display: none;">✓</span>
+                </div>
                 <div id="sugerencias-origen" class="sugerencias"></div>
+                <small style="color: #666; font-size: 12px;">Selecciona una opción de la lista de sugerencias</small>
             </div>
 
             <div class="form-group">
                 <label for="destinoFinal">Destino Final *</label>
-                <input type="text" id="destinoFinal" name="destinoFinal" required>
+                <div style="position: relative;">
+                    <input type="text" id="destinoFinal" name="destinoFinal" required>
+                    <span id="destinoStatus" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 20px; display: none;">✓</span>
+                </div>
                 <div id="sugerencias-destino" class="sugerencias"></div>
+                <small style="color: #666; font-size: 12px;">Selecciona una opción de la lista de sugerencias</small>
             </div>
 
             <!-- Paradas Adicionales -->
