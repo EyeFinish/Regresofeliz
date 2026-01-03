@@ -990,7 +990,7 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         
         const API_URL = isLocal 
             ? 'http://localhost:3000' 
-            : window.location.origin;
+            : 'https://regresofeliz.onrender.com';
         
         console.log('🌐 Enviando a:', `${API_URL}/api/cotizacion`);
         
