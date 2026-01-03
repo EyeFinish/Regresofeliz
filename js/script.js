@@ -777,6 +777,53 @@ function mostrarMensaje(texto, tipo) {
     }, 5000);
 }
 
+// Función para mostrar pantalla de carga
+function mostrarPantallaCarga() {
+    const overlay = document.createElement('div');
+    overlay.id = 'loading-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 999998;
+        animation: fadeIn 0.3s ease-in;
+    `;
+    
+    overlay.innerHTML = `
+        <div style="text-align: center;">
+            <div style="border: 8px solid #f3f3f3; border-top: 8px solid #667eea; border-radius: 50%; width: 80px; height: 80px; animation: spin 1s linear infinite; margin: 0 auto 30px;"></div>
+            <h2 style="color: white; font-size: 24px; margin-bottom: 10px;">Enviando cotización...</h2>
+            <p style="color: #ccc; font-size: 16px;">Por favor espera un momento</p>
+        </div>
+    `;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+}
+
+// Función para ocultar pantalla de carga
+function ocultarPantallaCarga() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
 // Función para mostrar notificación fullscreen
 function mostrarNotificacionFullscreen() {
     console.log('🎉 Mostrando notificación fullscreen...');
@@ -1027,11 +1074,19 @@ document.getElementById('reservaForm').addEventListener('submit', async function
     
     console.log('📤 Enviando cotización al servidor...', datosFormulario);
     
+    // Mostrar pantalla de carga
+    mostrarPantallaCarga();
+    
     try {
         // Detectar si estamos en local o producción
-        const API_URL = window.location.hostname === 'localhost' 
+        const isLocal = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1';
+        
+        const API_URL = isLocal 
             ? 'http://localhost:3000' 
             : window.location.origin;
+        
+        console.log('🌐 Enviando a:', `${API_URL}/api/cotizacion`);
         
         // Enviar datos al backend
         const response = await fetch(`${API_URL}/api/cotizacion`, {
@@ -1044,72 +1099,31 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         
         const resultado = await response.json();
         
+        console.log('📊 Resultado del servidor:', resultado);
+        console.log('🔍 resultado.ok =', resultado.ok);
+        
         if (resultado.ok) {
             console.log('✅ Cotización guardada correctamente');
+            console.log('🔄 Ocultando pantalla de carga...');
             
-            // Mostrar notificación fullscreen
-            mostrarNotificacionFullscreen();
+            // Ocultar pantalla de carga
+            ocultarPantallaCarga();
             
-            // Redirigir a inicio después de 4 segundos
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 4000);
+            console.log('🎉 REDIRIGIENDO AHORA a cotizacion-exitosa.html');
+            console.log('🌐 URL actual:', window.location.href);
+            console.log('🚀 Ejecutando redirección...');
             
-            return; // No limpiar el formulario aquí, se redirige a inicio
-            
-            // Limpiar formulario después de 3 segundos (código ya no usado)
-            setTimeout(() => {
-                form.reset();
-                document.getElementById('distanciaContainer').style.display = 'none';
-                
-                // Limpiar mapa y marcadores
-                if (origenMarker) map.removeLayer(origenMarker);
-                if (destinoMarker) map.removeLayer(destinoMarker);
-                if (routeLayer) map.removeLayer(routeLayer);
-                
-                // Limpiar marcadores de paradas adicionales
-                paradasAdicionales.forEach(parada => {
-                    if (parada && parada.marker) {
-                        map.removeLayer(parada.marker);
-                    }
-                });
-                
-                origenMarker = null;
-                destinoMarker = null;
-                routeLayer = null;
-                origenCoords = null;
-                destinoCoords = null;
-                paradasAdicionales = [];
-                
-                // Limpiar el contenedor de paradas adicionales
-                const paradasContainer = document.getElementById('paradasContainer');
-                if (paradasContainer) {
-                    paradasContainer.innerHTML = '';
-                }
-                
-                // Resetear vista del mapa
-                map.setView([-33.4489, -70.6693], 12);
-                
-                // Resetear resumen
-                document.getElementById('resumen-fecha').textContent = '--';
-                document.getElementById('resumen-nombre').textContent = '--';
-                document.getElementById('resumen-correo').textContent = '--';
-                document.getElementById('resumen-telefono').textContent = '--';
-                document.getElementById('resumen-hora').textContent = '--';
-                document.getElementById('resumen-origen').textContent = '--';
-                document.getElementById('resumen-destino').textContent = '--';
-                document.getElementById('resumen-duracion').textContent = '--';
-                document.getElementById('resumen-vehiculo').textContent = '--';
-                document.getElementById('resumen-patente').textContent = '--';
-                document.getElementById('resumen-personas').textContent = '--';
-            }, 3000);
-            
+            // Redirigir INMEDIATAMENTE
+            window.location.href = 'cotizacion-exitosa.html';
+        
         } else {
+            ocultarPantallaCarga();
             mostrarMensaje('Error al guardar la cotización. Por favor, intenta nuevamente.', 'error');
             console.error('❌ Error del servidor:', resultado.mensaje);
         }
         
     } catch (error) {
+        ocultarPantallaCarga();
         console.error('❌ Error de conexión:', error);
         mostrarMensaje('Error de conexión con el servidor. Asegúrate de que el servidor esté funcionando (ejecuta: node server.js)', 'error');
     }

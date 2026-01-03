@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotización Enviada - Regreso Feliz</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #0a0a1a 50%, #001a33 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-in;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Efecto de partículas de fondo */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(0, 191, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 128, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes checkmark {
+            0% { 
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% { 
+                transform: scale(1.2) rotate(180deg);
+            }
+            100% { 
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 20px rgba(0, 191, 255, 0.5));
+            }
+            50% { 
+                filter: drop-shadow(0 0 40px rgba(0, 191, 255, 0.8));
+            }
+        }
+
+        .container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(0, 191, 255, 0.2),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            animation: slideUp 0.6s ease-out;
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .checkmark {
+            font-size: 100px;
+            margin-bottom: 30px;
+            animation: checkmark 0.8s ease-out, glow 2s ease-in-out infinite;
+            display: inline-block;
+            filter: drop-shadow(0 0 30px rgba(0, 191, 255, 0.8));
+        }
+
+        h1 {
+            color: #00BFFF;
+            font-size: 36px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+        }
+
+        .message {
+            color: #FFFFFF;
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .sub-message {
+            color: #B0B0B0;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .thank-you {
+            color: #00BFFF;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+        }
+
+        .btn-home {
+            display: inline-block;
+            background: linear-gradient(135deg, #00BFFF 0%, #0080FF 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 10px 30px rgba(0, 191, 255, 0.4),
+                0 0 20px rgba(0, 191, 255, 0.3);
+            border: 2px solid rgba(0, 191, 255, 0.5);
+        }
+
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 15px 40px rgba(0, 191, 255, 0.6),
+                0 0 40px rgba(0, 191, 255, 0.5);
+            background: linear-gradient(135deg, #40E0D0 0%, #00BFFF 100%);
+        }
+
+        .countdown {
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .countdown span {
+            color: #00BFFF;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 25px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .message {
+                font-size: 18px;
+            }
+
+            .sub-message {
+                font-size: 16px;
+            }
+
+            .checkmark {
+                font-size: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="checkmark">✅</div>
+        
+        <h1>¡Cotización Enviada Exitosamente!</h1>
+        
+        <p class="message">
+            Tu solicitud de cotización ha sido recibida correctamente.
+        </p>
+        
+        <p class="sub-message">
+            Nuestro equipo de <strong style="color: #00BFFF;">Regreso Feliz</strong> revisará tu información y se pondrá en contacto contigo en brevedad para enviarte el detalle completo y el valor de tu servicio.
+        </p>
+        
+        <p class="thank-you">
+            ¡Muchas gracias por tu preferencia! 💜
+        </p>
+        
+        <a href="index.html" class="btn-home">Volver al Inicio</a>
+        
+        <p class="countdown" id="countdown">
+            Serás redirigido automáticamente en <span id="seconds">8</span> segundos...
+        </p>
+    </div>
+
+    <script>
+        // Countdown para redirección automática
+        let seconds = 8;
+        const countdownElement = document.getElementById('seconds');
+        
+        const countdown = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = seconds;
+            
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                window.location.href = 'index.html';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
