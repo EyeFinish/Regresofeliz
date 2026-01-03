@@ -10,12 +10,6 @@ const PORT = process.env.PORT || 3000;
 const JSON_FILE = path.join(__dirname, 'cotizaciones.json');
 const EXCEL_FILE = path.join(__dirname, 'cotizaciones.xlsx');
 
-// URL base dinámica (Render en producción, localhost en desarrollo)
-const BASE_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
-
-// Almacenamiento temporal de mensajes generados
-const mensajesGenerados = new Map();
-
 // Configuración de Google Sheets
 const SPREADSHEET_ID = '1DIQGWq6PNK8aER5_KS3xBZ8nKwZHz8kvIKOqIR_Hr0M';
 const CREDENTIALS_FILE = path.join(__dirname, 'augmented-clock-483201-v4-5f1f5be512c5.json');
@@ -102,20 +96,9 @@ async function guardarEnGoogleSheets(datos) {
     try {
         const sheets = await getGoogleSheetsClient();
         
-        // Generar ID único para el mensaje
-        const mensajeId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        
         // Crear mensaje de cotización para el cliente
         const mensajeCotizacion = crearMensajeCotizacion(datos);
-        
-        // Guardar mensaje en memoria
-        mensajesGenerados.set(mensajeId, mensajeCotizacion);
-        
-        // Crear link al mensaje
-        const linkMensaje = `${BASE_URL}/mensaje/${mensajeId}`;
-        
         console.log(`📝 Mensaje generado (${mensajeCotizacion.length} caracteres)`);
-        console.log(`🔗 Link: ${linkMensaje}`);
         
         // Crear link de WhatsApp (formato: +56XXXXXXXXX sin espacios ni caracteres especiales)
         const telefonoLimpio = datos.telefono.replace(/\D/g, ''); // Eliminar todo excepto números
@@ -151,8 +134,8 @@ async function guardarEnGoogleSheets(datos) {
             datos.codigoDescuento || '',
             datos.descuentoAplicado || 0,
             '', // Separador COMUNICACIÓN
-            linkMensaje,    // Link al mensaje
-            linkWhatsApp    // Link de WhatsApp
+            mensajeCotizacion,  // Mensaje completo para copiar
+            linkWhatsApp        // Link de WhatsApp
         ];
         
         // Verificar si la hoja tiene encabezados
@@ -187,7 +170,7 @@ async function guardarEnGoogleSheets(datos) {
                         '💰 COTIZACIÓN',
                         'COSTO BASE ($)', 'COSTO FINAL ($)', 'CÓDIGO DESCUENTO', 'DESCUENTO ($)',
                         '📱 COMUNICACIÓN',
-                        'VER MENSAJE', 'LINK WHATSAPP'
+                        'MENSAJE PARA CLIENTE', 'LINK WHATSAPP'
                     ]]
                 }
             });
@@ -380,7 +363,7 @@ async function guardarEnGoogleSheets(datos) {
                 { startIndex: 24, endIndex: 25, width: 130 }, // Y - Código
                 { startIndex: 25, endIndex: 26, width: 100 }, // Z - Descuento
                 { startIndex: 26, endIndex: 27, width: 30 },  // AA - Separador
-                { startIndex: 27, endIndex: 28, width: 280 }, // AB - Link Mensaje
+                { startIndex: 27, endIndex: 28, width: 250 }, // AB - Mensaje completo
                 { startIndex: 28, endIndex: 29, width: 250 }  // AC - Link WhatsApp
             ];
             
