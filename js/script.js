@@ -777,83 +777,89 @@ function mostrarMensaje(texto, tipo) {
     }, 5000);
 }
 
-// Manejar envío del formulario
-form.addEventListener('submit', function(event) {
-    event.preventDefault();
+// Función para mostrar notificación fullscreen
+function mostrarNotificacionFullscreen() {
+    console.log('🎉 Mostrando notificación fullscreen...');
     
-    // Obtener valores del formulario
-    const formData = {
-        nombre: document.getElementById('nombre').value.trim(),
-        correo: document.getElementById('correo').value.trim(),
-        telefono: document.getElementById('telefono').value.trim(),
-        centroEvento: document.getElementById('centroEvento').value.trim(),
-        destinoFinal: document.getElementById('destinoFinal').value.trim(),
-        distancia: window._cotizacion_distancia ? window._cotizacion_distancia + ' km' : '',
-        duracion: window._cotizacion_duracion ? window._cotizacion_duracion + ' min' : '',
-        costo: window._cotizacion_costo ? '$' + window._cotizacion_costo : '',
-        numeroPersonas: document.getElementById('numeroPersonas').value,
-        marcaModelo: document.getElementById('marcaModelo').value.trim(),
-        tipoTransmision: document.getElementById('tipoTransmision').value,
-        patente: document.getElementById('patente').value.trim().toUpperCase(),
-        seguro: document.querySelector('input[name="seguro"]:checked').value
-    };
+    // Bloquear scroll del body
+    document.body.style.overflow = 'hidden';
     
-    // Validaciones adicionales
-    if (!validarTelefono(formData.telefono)) {
-        mostrarMensaje('Por favor, ingrese un número de teléfono válido', 'error');
-        return;
-    }
+    // Crear overlay fullscreen
+    const overlay = document.createElement('div');
+    overlay.id = 'notificacion-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        animation: fadeIn 0.5s ease-in;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+    `;
     
-    if (!validarPatente(formData.patente)) {
-        mostrarMensaje('Por favor, ingrese una patente válida (Ej: ABCD12 o AB1234)', 'error');
-        return;
-    }
+    // Contenido de la notificación
+    const contenido = document.createElement('div');
+    contenido.style.cssText = `
+        background: white;
+        padding: 60px 40px;
+        border-radius: 20px;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        text-align: center;
+        max-width: 600px;
+        width: 90%;
+        animation: slideUp 0.6s ease-out;
+        position: relative;
+    `;
     
-    if (formData.numeroPersonas < 1) {
-        mostrarMensaje('El número de personas debe ser al menos 1', 'error');
-        return;
-    }
+    contenido.innerHTML = `
+        <div style="font-size: 80px; margin-bottom: 20px;">✅</div>
+        <h1 style="color: #667eea; font-size: 32px; margin-bottom: 20px; font-weight: bold;">
+            ¡Cotización Enviada!
+        </h1>
+        <p style="color: #555; font-size: 18px; line-height: 1.6; margin-bottom: 15px;">
+            Tu solicitud ha sido recibida exitosamente.
+        </p>
+        <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+            Nos contactaremos contigo en brevedad con el detalle y valor de tu cotización.
+        </p>
+        <p style="color: #764ba2; font-size: 20px; font-weight: bold;">
+            ¡Muchas gracias por tu preferencia! 💜
+        </p>
+        <div style="margin-top: 30px; color: #999; font-size: 14px;">
+            Serás redirigido al inicio en unos segundos...
+        </div>
+    `;
     
-    // Mostrar los datos en consola (aquí podrías enviarlos a un servidor)
-    console.log('Datos del formulario:', formData);
+    overlay.appendChild(contenido);
+    document.body.appendChild(overlay);
     
-    // Mensaje de éxito
-    mostrarMensaje('¡Reserva enviada exitosamente! Nos contactaremos pronto.', 'exito');
-    
-    // Limpiar formulario después de 2 segundos
-    setTimeout(() => {
-        form.reset();
-        document.getElementById('distanciaContainer').style.display = 'none';
-        
-        // Limpiar mapa y marcadores
-        if (origenMarker) map.removeLayer(origenMarker);
-        if (destinoMarker) map.removeLayer(destinoMarker);
-        if (routeLayer) map.removeLayer(routeLayer);
-        
-        // Limpiar marcadores de paradas adicionales
-        paradasAdicionales.forEach(parada => {
-            if (parada && parada.marker) {
-                map.removeLayer(parada.marker);
-            }
-        });
-        
-        origenMarker = null;
-        destinoMarker = null;
-        routeLayer = null;
-        origenCoords = null;
-        destinoCoords = null;
-        paradasAdicionales = [];
-        
-        // Limpiar el contenedor de paradas adicionales
-        const paradasContainer = document.getElementById('paradasContainer');
-        if (paradasContainer) {
-            paradasContainer.innerHTML = '';
+    // Agregar animaciones CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        
-        // Resetear vista del mapa
-        map.setView([-33.4489, -70.6693], 12);
-    }, 2000);
-});
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
 
 // Formatear patente automáticamente
 document.getElementById('patente').addEventListener('input', function(e) {
@@ -950,8 +956,8 @@ function actualizarResumenRuta(distanciaKm, duracionMin, costoTotal) {
     window._cotizacion_duracion = duracionMin;
 }
 
-// Enviar reserva por WhatsApp
-document.getElementById('reservaForm').addEventListener('submit', function(e) {
+// Enviar cotización al backend (sin redirección a WhatsApp)
+document.getElementById('reservaForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     // Recopilar datos del formulario
@@ -971,25 +977,6 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
     const fechaReserva = document.getElementById('fechaReserva').value;
     const codigoDescuento = document.getElementById('codigoDescuento').value.trim();
     
-    // Formatear valores con separador de miles y sin decimales
-    function formatearPesos(valor) {
-        return Number(valor).toLocaleString('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    }
-    // Obtener el costo original como número
-    console.log('DEBUG - Costo antes de redondear:', window._cotizacion_costo);
-    let costoOriginal = Math.round(window._cotizacion_costo || 0);
-    console.log('DEBUG - Costo original redondeado:', costoOriginal);
-    let descuento = 0;
-    let costoFinal = costoOriginal;
-    let detalleDescuento = '';
-    if ((codigoDescuento === '123' || codigoDescuento.toUpperCase() === 'CONYYJAVIER' || codigoDescuento.toUpperCase() === 'AGUSTINYCATALINA' || codigoDescuento.toUpperCase() === 'DSCT10OFF' || codigoDescuento.toUpperCase() === 'SABINE10') && costoOriginal > 0) {
-        descuento = Math.round(costoOriginal * 0.10);
-        costoFinal = costoOriginal - descuento;
-        console.log('DEBUG - Descuento:', descuento, 'Costo final:', costoFinal);
-        detalleDescuento = `\n*Precio original: $${formatearPesos(costoOriginal)}*\n*Descuento (10%): -$${formatearPesos(descuento)}*\n*Total: $${formatearPesos(costoFinal)}*`;
-    }
-    const costo = costoFinal ? '$' + formatearPesos(costoFinal) : '';
-    
     // Validar campos obligatorios
     if (!nombre || !correo || !telefono || !horaPresentacion || !centroEvento || !destinoFinal || !numeroPersonas || 
         !marcaModelo || !transmision || !patente || !seguro) {
@@ -997,105 +984,133 @@ document.getElementById('reservaForm').addEventListener('submit', function(e) {
         return;
     }
     
-    // Obtener datos de ruta solo de variables globales
-    const distancia = window._cotizacion_distancia ? window._cotizacion_distancia + ' km' : '--';
-    const duracion = window._cotizacion_duracion ? window._cotizacion_duracion + ' min' : '--';
+    // Calcular costos y descuentos
+    let costoOriginal = Math.round(window._cotizacion_costo || 0);
+    let descuento = 0;
+    let costoFinal = costoOriginal;
     
-    // Obtener nombre corto de ubicaciones (solo primera parte antes de la coma)
-    const origenCorto = centroEvento.split(',')[0].trim();
-    const destinoCorto = destinoFinal.split(',')[0].trim();
-    
-    // Construir información de paradas adicionales
-    const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
-    let infoParadas = '';
-    if (paradasValidas.length > 0) {
-        infoParadas = '\n*🛑 Paradas adicionales:*\n';
-        paradasValidas.forEach((parada, idx) => {
-            const paradaCorta = parada.direccion.split(',')[0].trim();
-            infoParadas += `   ${idx + 1}. ${paradaCorta}\n`;
-        });
-        infoParadas += `   *Costo paradas: $${formatearPesos(window._cotizacion_costo_paradas || 0)}*\n`;
+    if ((codigoDescuento === '123' || codigoDescuento.toUpperCase() === 'CONYYJAVIER' || 
+         codigoDescuento.toUpperCase() === 'AGUSTINYCATALINA' || codigoDescuento.toUpperCase() === 'DSCT10OFF' || 
+         codigoDescuento.toUpperCase() === 'SABINE10') && costoOriginal > 0) {
+        descuento = Math.round(costoOriginal * 0.10);
+        costoFinal = costoOriginal - descuento;
     }
     
-    // Crear mensaje para WhatsApp
-    // Generar mensaje más natural con variación aleatoria
-    const saludos = ['Hola', 'Hola!', 'Buenas', 'Hola, como estas?'];
-    const intros = [
-        'necesito cotizar un angelito',
-        'quisiera solicitar un angelito',
-        'me gustaria solicitar el servicio',
-        'requiero contratar un angelito'
-    ];
-    const despedidas = ['Gracias!', 'Saludos', 'Quedo atento', 'Espero tu respuesta'];
+    // Obtener paradas adicionales
+    const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
+    const paradasTexto = paradasValidas.map(p => p.direccion).join(' | ');
     
-    // Seleccionar variaciones aleatorias
-    const saludo = saludos[Math.floor(Math.random() * saludos.length)];
-    const intro = intros[Math.floor(Math.random() * intros.length)];
-    const despedida = despedidas[Math.floor(Math.random() * despedidas.length)];
-    
-    // Convertir hora a formato 12 horas con AM/PM
-    const convertirAMPM = (hora) => {
-        const [horas, minutos] = hora.split(':');
-        let h = parseInt(horas);
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12;
-        return `${h}:${minutos} ${ampm}`;
+    // Preparar datos para enviar al backend
+    const datosFormulario = {
+        fechaReserva: fechaReserva,
+        nombre: nombre,
+        correo: correo,
+        telefono: telefono,
+        telefono2: telefono2,
+        horaPresentacion: horaPresentacion,
+        centroEvento: centroEvento,
+        destinoFinal: destinoFinal,
+        paradasAdicionales: paradasTexto,
+        numParadas: paradasValidas.length,
+        numeroPersonas: numeroPersonas,
+        marcaModelo: marcaModelo,
+        tipoTransmision: transmision,
+        patente: patente.toUpperCase(),
+        seguro: seguro,
+        distanciaKm: window._cotizacion_distancia || '',
+        duracionMin: window._cotizacion_duracion || '',
+        costoBase: costoOriginal,
+        costoFinal: costoFinal,
+        codigoDescuento: codigoDescuento,
+        descuentoAplicado: descuento
     };
     
-    const horaFormateada = convertirAMPM(horaPresentacion);
+    console.log('📤 Enviando cotización al servidor...', datosFormulario);
     
-    // Crear mensaje más natural y corto con emojis básicos
-    let mensaje = `${saludo} 👋, ${intro} para el *${fechaReserva}* a las *${horaFormateada}* ⏰\n\n`;
-    mensaje += `📍 *Datos del viaje:*\n`;
-    mensaje += `▪️ Origen: *${origenCorto}*\n`;
-    mensaje += `▪️ Destino: *${destinoCorto}*\n`;
-    if (infoParadas) {
-        mensaje += `${infoParadas}\n`;
+    try {
+        // Detectar si estamos en local o producción
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : window.location.origin;
+        
+        // Enviar datos al backend
+        const response = await fetch(`${API_URL}/api/cotizacion`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosFormulario)
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.ok) {
+            console.log('✅ Cotización guardada correctamente');
+            
+            // Mostrar notificación fullscreen
+            mostrarNotificacionFullscreen();
+            
+            // Redirigir a inicio después de 4 segundos
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 4000);
+            
+            return; // No limpiar el formulario aquí, se redirige a inicio
+            
+            // Limpiar formulario después de 3 segundos (código ya no usado)
+            setTimeout(() => {
+                form.reset();
+                document.getElementById('distanciaContainer').style.display = 'none';
+                
+                // Limpiar mapa y marcadores
+                if (origenMarker) map.removeLayer(origenMarker);
+                if (destinoMarker) map.removeLayer(destinoMarker);
+                if (routeLayer) map.removeLayer(routeLayer);
+                
+                // Limpiar marcadores de paradas adicionales
+                paradasAdicionales.forEach(parada => {
+                    if (parada && parada.marker) {
+                        map.removeLayer(parada.marker);
+                    }
+                });
+                
+                origenMarker = null;
+                destinoMarker = null;
+                routeLayer = null;
+                origenCoords = null;
+                destinoCoords = null;
+                paradasAdicionales = [];
+                
+                // Limpiar el contenedor de paradas adicionales
+                const paradasContainer = document.getElementById('paradasContainer');
+                if (paradasContainer) {
+                    paradasContainer.innerHTML = '';
+                }
+                
+                // Resetear vista del mapa
+                map.setView([-33.4489, -70.6693], 12);
+                
+                // Resetear resumen
+                document.getElementById('resumen-fecha').textContent = '--';
+                document.getElementById('resumen-nombre').textContent = '--';
+                document.getElementById('resumen-correo').textContent = '--';
+                document.getElementById('resumen-telefono').textContent = '--';
+                document.getElementById('resumen-hora').textContent = '--';
+                document.getElementById('resumen-origen').textContent = '--';
+                document.getElementById('resumen-destino').textContent = '--';
+                document.getElementById('resumen-duracion').textContent = '--';
+                document.getElementById('resumen-vehiculo').textContent = '--';
+                document.getElementById('resumen-patente').textContent = '--';
+                document.getElementById('resumen-personas').textContent = '--';
+            }, 3000);
+            
+        } else {
+            mostrarMensaje('Error al guardar la cotización. Por favor, intenta nuevamente.', 'error');
+            console.error('❌ Error del servidor:', resultado.mensaje);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error de conexión:', error);
+        mostrarMensaje('Error de conexión con el servidor. Asegúrate de que el servidor esté funcionando (ejecuta: node server.js)', 'error');
     }
-    mensaje += `▪️ Distancia: *${distancia}* 📏\n`;
-    mensaje += `▪️ Personas: *${numeroPersonas}* 👥\n\n`;
-    
-    mensaje += `🚗 *Vehiculo:*\n`;
-    mensaje += `▪️ Modelo: *${marcaModelo}*\n`;
-    mensaje += `▪️ Patente: *${patente.toUpperCase()}*\n`;
-    mensaje += `▪️ Transmision: *${transmision === 'automatico' ? 'Automatica' : 'Mecanica'}* ⚙️\n`;
-    mensaje += `▪️ Seguro: *${seguro === 'si' ? 'Si' : 'No'}*\n\n`;
-    
-    mensaje += `👤 *Mis datos:*\n`;
-    mensaje += `▪️ Nombre: *${nombre}*\n`;
-    mensaje += `▪️ Telefono: *${telefono}* 📱\n`;
-    mensaje += `▪️ Email: *${correo}* 📧\n\n`;
-    
-    if (detalleDescuento) {
-        mensaje += `💰 ${detalleDescuento}\n\n`;
-    } else if (costo) {
-        mensaje += `💰 Valor estimado: *${costo}*\n\n`;
-    }
-    
-    mensaje += `${despedida} ✅\n\n`;
-    mensaje += `🌐 https://regresofeliz.com`;
-    
-    // Codificar mensaje para URL
-    const mensajeCodificado = encodeURIComponent(mensaje);
-    
-    // Número de WhatsApp (sin +)
-    const numeroWhatsApp = '56926974449';
-    
-    // Detectar si es móvil y usar el método apropiado
-    const esMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // URL de WhatsApp
-    const urlWhatsApp = esMobile 
-        ? `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`
-        : `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${mensajeCodificado}`;
-    
-    // Abrir WhatsApp directamente
-    mostrarMensaje('Redirigiendo a WhatsApp...', 'success');
-    
-    if (esMobile) {
-        window.location.href = urlWhatsApp;
-    } else {
-        window.open(urlWhatsApp, '_blank');
-    }
-    // ======================================================
 });

@@ -1,0 +1,5 @@
+# Render Deploy Configuration
+# https://render.com
+
+# Build Command: npm install
+# Start Command: npm start

@@ -4,6 +4,7 @@
   "description": "Sitio web de RegresoFeliz - Servicio de angelito",
   "main": "index.html",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"No tests configured\""
   },
   "keywords": [
@@ -12,5 +13,10 @@
     "conductor"
   ],
   "author": "RegresoFeliz",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1"
+  }
 }
