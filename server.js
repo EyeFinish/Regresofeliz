@@ -146,7 +146,7 @@ async function guardarEnGoogleSheets(datos) {
         
         // Verificar si necesitamos actualizar encabezados (si no existen o están incompletos)
         const encabezadosExistentes = result.data.values ? result.data.values[0] : [];
-        const tieneColumnaComunicacion = encabezadosExistentes[26] && encabezadosExistentes[26].includes('COMUNICACIÓN');
+        const tieneColumnaComunicacion = encabezadosExistentes[27] && encabezadosExistentes[27].includes('MENSAJE');
         const necesitaActualizacion = !result.data.values || result.data.values.length === 0 || encabezadosExistentes.length < 29 || !tieneColumnaComunicacion;
         
         // Si no hay encabezados o están incompletos, crearlos/actualizarlos y formatear
