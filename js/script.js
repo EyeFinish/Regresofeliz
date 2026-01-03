@@ -824,90 +824,6 @@ function ocultarPantallaCarga() {
     }
 }
 
-// Función para mostrar notificación fullscreen
-function mostrarNotificacionFullscreen() {
-    console.log('🎉 Mostrando notificación fullscreen...');
-    
-    // Bloquear scroll del body
-    document.body.style.overflow = 'hidden';
-    
-    // Crear overlay fullscreen
-    const overlay = document.createElement('div');
-    overlay.id = 'notificacion-overlay';
-    overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 999999;
-        animation: fadeIn 0.5s ease-in;
-        margin: 0;
-        padding: 20px;
-        box-sizing: border-box;
-    `;
-    
-    // Contenido de la notificación
-    const contenido = document.createElement('div');
-    contenido.style.cssText = `
-        background: white;
-        padding: 60px 40px;
-        border-radius: 20px;
-        box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-        text-align: center;
-        max-width: 600px;
-        width: 90%;
-        animation: slideUp 0.6s ease-out;
-        position: relative;
-    `;
-    
-    contenido.innerHTML = `
-        <div style="font-size: 80px; margin-bottom: 20px;">✅</div>
-        <h1 style="color: #667eea; font-size: 32px; margin-bottom: 20px; font-weight: bold;">
-            ¡Cotización Enviada!
-        </h1>
-        <p style="color: #555; font-size: 18px; line-height: 1.6; margin-bottom: 15px;">
-            Tu solicitud ha sido recibida exitosamente.
-        </p>
-        <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-            Nos contactaremos contigo en brevedad con el detalle y valor de tu cotización.
-        </p>
-        <p style="color: #764ba2; font-size: 20px; font-weight: bold;">
-            ¡Muchas gracias por tu preferencia! 💜
-        </p>
-        <div style="margin-top: 30px; color: #999; font-size: 14px;">
-            Serás redirigido al inicio en unos segundos...
-        </div>
-    `;
-    
-    overlay.appendChild(contenido);
-    document.body.appendChild(overlay);
-    
-    // Agregar animaciones CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
-
 // Formatear patente automáticamente
 document.getElementById('patente').addEventListener('input', function(e) {
     e.target.value = e.target.value.toUpperCase();
@@ -991,16 +907,6 @@ function configurarActualizacionResumen() {
     document.getElementById('fechaReserva').addEventListener('change', function(e) {
         document.getElementById('resumen-fecha').textContent = e.target.value || '--';
     });
-}
-
-// Actualizar resumen con información de ruta
-function actualizarResumenRuta(distanciaKm, duracionMin, costoTotal) {
-    // Esta función ya no actualiza el resumen visual de distancia/costo
-    // Solo se mantiene para compatibilidad si es llamada en otro lugar
-    // Los valores se guardan en variables globales
-    window._cotizacion_costo = costoTotal;
-    window._cotizacion_distancia = distanciaKm;
-    window._cotizacion_duracion = duracionMin;
 }
 
 // Enviar cotización al backend (sin redirección a WhatsApp)
