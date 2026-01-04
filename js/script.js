@@ -1,6 +1,13 @@
 // MAPBOX CONFIGURATION
 const MAPBOX_TOKEN = 'pk.eyJ1IjoicmVncmVzb2ZlbGl6IiwiYSI6ImNtajNjNXVnMDE1OTMzcHB6ZzBiMWx1dXIifQ.W2JNrM712264cNmKX5a8iw';
 
+// EMAILJS CONFIGURATION
+(function() {
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init({ publicKey: 'GbZ0qGGvRDFXJe93D' });
+    }
+})();
+
 // BASE DE DATOS LOCAL - Centros de Eventos y Lugares Populares en Chile
 const LUGARES_PREDEFINIDOS = [
     // Centros de Eventos - Santiago
@@ -171,8 +178,6 @@ function configurarParadasAdicionales() {
 // Buscar lugar para parada adicional
 async function buscarLugarParada(query, contenedorSugerencias, index) {
     try {
-        console.log('🔍 Buscando parada:', query);
-        
         const resultadosLocales = buscarEnBaseDatosLocal(query);
         const promesaMapbox = buscarEnMapbox(query);
         
@@ -194,7 +199,6 @@ async function buscarLugarParada(query, contenedorSugerencias, index) {
         await buscarLugarNominatimParada(query, contenedorSugerencias, index);
         
     } catch (error) {
-        console.error('❌ Error en búsqueda de parada:', error);
         await buscarLugarNominatimParada(query, contenedorSugerencias, index);
     }
 }
@@ -212,7 +216,6 @@ async function buscarLugarNominatimParada(query, contenedorSugerencias, index) {
         
         mostrarSugerenciasParada(lugares, contenedorSugerencias, index);
     } catch (error) {
-        console.error('❌ Error en búsqueda de Nominatim para parada:', error);
         mostrarSugerenciasParada([], contenedorSugerencias, index);
     }
 }
@@ -285,9 +288,6 @@ function seleccionarLugarParada(lugar, index) {
     }).addTo(map).bindPopup(`Parada ${index + 1}`).openPopup();
     
     paradasAdicionales[index].marker = marker;
-    
-    console.log(`Parada ${index + 1} seleccionada:`, lugar.display_name);
-    
     // Recalcular ruta si hay origen y destino
     if (origenCoords && destinoCoords) {
         calcularRuta();
@@ -310,9 +310,6 @@ function eliminarParada(index) {
     if (paradasAdicionales[index]) {
         paradasAdicionales[index] = null;
     }
-    
-    console.log(`Parada ${index + 1} eliminada`);
-    
     // Recalcular ruta
     if (origenCoords && destinoCoords) {
         calcularRuta();
@@ -341,8 +338,6 @@ function inicializarMapa() {
         zoomOffset: -1,
         accessToken: MAPBOX_TOKEN
     }).addTo(map);
-    
-    console.log('Mapa Mapbox inicializado correctamente');
 }
 
 // Configurar autocompletado con Nominatim (OpenStreetMap)
@@ -407,12 +402,8 @@ function configurarAutocompletado() {
 // Buscar lugares - Sistema Híbrido (Base de datos local + Mapbox + Nominatim)
 async function buscarLugar(query, contenedorSugerencias, esOrigen) {
     try {
-        console.log('🔍 Buscando:', query);
-        
         // PASO 1: Buscar en base de datos local (instantáneo)
         const resultadosLocales = buscarEnBaseDatosLocal(query);
-        console.log('📦 Resultados locales:', resultadosLocales.length);
-        
         // PASO 2: Buscar en Mapbox (en paralelo)
         const promesaMapbox = buscarEnMapbox(query);
         
@@ -422,7 +413,6 @@ async function buscarLugar(query, contenedorSugerencias, esOrigen) {
             const todosCombinados = [...resultadosLocales, ...resultadosMapbox];
             // Eliminar duplicados por nombre similar
             const unicos = eliminarDuplicados(todosCombinados);
-            console.log('✅ Total lugares encontrados:', unicos.length);
             mostrarSugerencias(unicos, contenedorSugerencias, esOrigen);
             return;
         }
@@ -431,7 +421,6 @@ async function buscarLugar(query, contenedorSugerencias, esOrigen) {
         const resultadosMapbox = await promesaMapbox;
         
         if (resultadosMapbox.length > 0) {
-            console.log('✅ Resultados de Mapbox:', resultadosMapbox.length);
             mostrarSugerencias(resultadosMapbox, contenedorSugerencias, esOrigen);
             return;
         }
@@ -441,7 +430,6 @@ async function buscarLugar(query, contenedorSugerencias, esOrigen) {
         await buscarLugarNominatim(query, contenedorSugerencias, esOrigen);
         
     } catch (error) {
-        console.error('❌ Error en búsqueda:', error);
         await buscarLugarNominatim(query, contenedorSugerencias, esOrigen);
     }
 }
@@ -475,7 +463,6 @@ async function buscarEnMapbox(query) {
         
         if (!response.ok) {
             if (response.status === 401) {
-                console.error('❌ Token de Mapbox inválido');
                 return [];
             }
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -503,7 +490,6 @@ async function buscarEnMapbox(query) {
         }));
         
     } catch (error) {
-        console.error('Error en Mapbox:', error);
         return [];
     }
 }
@@ -531,16 +517,11 @@ async function buscarLugarNominatim(query, contenedorSugerencias, esOrigen) {
             }
         });
         const lugares = await response.json();
-        
-        console.log('📍 Resultados de Nominatim:', lugares.length);
-        
         if (lugares.length === 0) {
-            console.log('⚠️ No se encontraron resultados para:', query);
         }
         
         mostrarSugerencias(lugares, contenedorSugerencias, esOrigen);
     } catch (error) {
-        console.error('❌ Error en búsqueda de Nominatim:', error);
         mostrarSugerencias([], contenedorSugerencias, esOrigen);
     }
 }
@@ -604,8 +585,6 @@ function seleccionarLugar(lugar, esOrigen) {
         origenMarker = L.marker([coords.lat, coords.lng], {
             title: 'Centro de Evento'
         }).addTo(map).bindPopup('Centro de Evento').openPopup();
-        
-        console.log('✅ Origen seleccionado:', lugar.display_name);
     } else {
         destinoFinalInput.value = lugar.display_name;
         destinoCoords = coords;
@@ -625,8 +604,6 @@ function seleccionarLugar(lugar, esOrigen) {
         destinoMarker = L.marker([coords.lat, coords.lng], {
             title: 'Destino Final'
         }).addTo(map).bindPopup('Destino Final').openPopup();
-        
-        console.log('✅ Destino seleccionado:', lugar.display_name);
     }
     
     // Si ambos están seleccionados, calcular ruta
@@ -638,29 +615,18 @@ function seleccionarLugar(lugar, esOrigen) {
 // Calcular y mostrar la mejor ruta usando Mapbox Directions API
 async function calcularRuta() {
     if (!origenCoords || !destinoCoords) {
-        console.log('Esperando ambas ubicaciones...', { origen: !!origenCoords, destino: !!destinoCoords });
         return;
     }
-
-    console.log('🗺️ Calculando mejor ruta entre:', origenCoords, 'y', destinoCoords);
-    
-    // SOLO calcular ruta entre origen y destino (sin paradas para el cálculo de km)
     let waypoints = `${origenCoords.lng},${origenCoords.lat}`;
     waypoints += `;${destinoCoords.lng},${destinoCoords.lat}`;
     
     // Obtener paradas válidas para el costo adicional (no afectan kilómetros)
     const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
-    
-    console.log('🛣️ Calculando distancia solo entre origen-destino. Paradas adicionales:', paradasValidas.length);
-
     try {
         const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${waypoints}?alternatives=false&geometries=geojson&steps=false&overview=full&access_token=${MAPBOX_TOKEN}`;
-        
-        console.log('📡 Solicitando ruta a Mapbox...');
         const response = await fetch(url);
         
         if (!response.ok) {
-            console.warn('⚠️ Mapbox Directions no disponible, usando OSRM como fallback...');
             return await calcularRutaOSRM();
         }
         
@@ -702,8 +668,6 @@ async function calcularRuta() {
             window._cotizacion_duracion = duracionMin;
             window._cotizacion_num_paradas = paradasValidas.length;
             window._cotizacion_costo_paradas = costoParadas;
-            
-            console.log('✅ ✅ ✅ RUTA Y COSTO CALCULADOS EXITOSAMENTE ✅ ✅ ✅');
             console.log('📊 Detalles de cotización:', { 
                 distancia: distanciaKm + ' km (solo origen-destino)', 
                 duracion: duracionMin + ' min', 
@@ -713,15 +677,11 @@ async function calcularRuta() {
                 costoTotal: '$' + costoTotal.toLocaleString('es-CL'),
                 formularioListoParaEnviar: true
             });
-            console.log('✅ window._cotizacion_costo =', window._cotizacion_costo);
         } else {
-            console.error('❌ No se pudo calcular la ruta');
             mostrarMensaje('No se pudo calcular la ruta. Verifica las ubicaciones.', 'error');
         }
     } catch (error) {
-        console.error('❌ Error al calcular ruta con Mapbox:', error);
         // Fallback a OSRM si Mapbox falla
-        console.log('🔄 Intentando con OSRM...');
         await calcularRutaOSRM();
     }
 }
@@ -774,8 +734,6 @@ async function calcularRutaOSRM() {
             window._cotizacion_duracion = duracionMin;
             window._cotizacion_num_paradas = paradasValidas.length;
             window._cotizacion_costo_paradas = costoParadas;
-            
-            console.log('✅ ✅ ✅ RUTA Y COSTO CALCULADOS CON OSRM ✅ ✅ ✅');
             console.log('📊 Detalles de cotización:', { 
                 distancia: distanciaKm + ' km', 
                 duracion: duracionMin + ' min', 
@@ -785,12 +743,10 @@ async function calcularRutaOSRM() {
                 costoTotal: '$' + costoTotal.toLocaleString('es-CL'),
                 formularioListoParaEnviar: true
             });
-            console.log('✅ window._cotizacion_costo =', window._cotizacion_costo);
         } else {
             mostrarMensaje('No se pudo calcular la ruta. Verifica las ubicaciones.', 'error');
         }
     } catch (error) {
-        console.error('Error al calcular la ruta:', error);
         mostrarMensaje('Error al calcular la ruta. Intenta nuevamente.', 'error');
     }
 }
@@ -1002,12 +958,6 @@ document.getElementById('reservaForm').addEventListener('submit', async function
     // Validar que el costo se haya calculado correctamente
     if (costoOriginal === 0 || !window._cotizacion_costo) {
         mostrarMensaje('⚠️ Error al calcular el costo. Por favor, verifica que el origen y destino sean correctos y que la ruta se haya calculado.', 'error');
-        console.error('❌ Costo no calculado. Variables:', {
-            _cotizacion_costo: window._cotizacion_costo,
-            origenCoords,
-            destinoCoords,
-            distancia: window._cotizacion_distancia
-        });
         return;
     }
     let descuento = 0;
@@ -1049,8 +999,6 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         descuentoAplicado: descuento
     };
     
-    console.log('📤 Enviando cotización al servidor...', datosFormulario);
-    
     // Mostrar pantalla de carga
     mostrarPantallaCarga();
     
@@ -1062,9 +1010,6 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         const API_URL = isLocal 
             ? 'http://localhost:3000' 
             : 'https://regresofeliz.onrender.com';
-        
-        console.log('🌐 Enviando a:', `${API_URL}/api/cotizacion`);
-        
         // Enviar datos al backend
         const response = await fetch(`${API_URL}/api/cotizacion`, {
             method: 'POST',
@@ -1076,27 +1021,31 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         
         const resultado = await response.json();
         
-        console.log('📊 Resultado del servidor:', resultado);
-        console.log('🔍 resultado.ok =', resultado.ok);
-        
         if (resultado.ok === true) {
-            console.log('✅ Cotización guardada correctamente - INICIANDO REDIRECCIÓN');
+            // Enviar notificación por correo
+            if (typeof emailjs !== 'undefined') {
+                emailjs.send('service_abc123', 'template_36qwypo', {
+                    to_email: 'soporte.regresofeliz@gmail.com',
+                    nombre_cliente: nombre,
+                    correo_cliente: correo,
+                    telefono_cliente: telefono,
+                    fecha_servicio: fechaReserva,
+                    hora_presentacion: horaPresentacion,
+                    origen: centroEvento,
+                    destino: destinoFinal,
+                    costo_final: `$${costoFinal.toLocaleString('es-CL')}`
+                }).catch(error => console.error('Error EmailJS:', error));
+            }
             
-            // Ocultar pantalla de carga
             ocultarPantallaCarga();
-            
-            // Redirigir inmediatamente
             window.location.href = 'cotizacion-exitosa.html';
-        
         } else {
             ocultarPantallaCarga();
             mostrarMensaje('Error al guardar la cotización. Por favor, intenta nuevamente.', 'error');
-            console.error('❌ Error del servidor:', resultado.mensaje);
         }
         
     } catch (error) {
         ocultarPantallaCarga();
-        console.error('❌ Error de conexión:', error);
-        mostrarMensaje('Error de conexión con el servidor. Asegúrate de que el servidor esté funcionando (ejecuta: node server.js)', 'error');
+        mostrarMensaje('Error de conexión con el servidor.', 'error');
     }
 });

@@ -44,13 +44,7 @@ Si necesitas configurar algo específico, agrega en "Environment":
 
 - El plan gratuito de Render "duerme" después de 15 minutos de inactividad
 - La primera carga puede tardar 30-60 segundos en despertar
-- Los archivos (cotizaciones.json y .xlsx) se perderán al reiniciar (solución: usar base de datos)
-
-## 📊 Para persistencia de datos:
-
-Considera agregar una base de datos:
-- Render PostgreSQL (gratis hasta 1GB)
-- MongoDB Atlas (gratis hasta 512MB)
+- **Todas las cotizaciones se guardan en Google Sheets** (persistencia permanente)
 
 ## 🚀 Actualizaciones futuras:
 

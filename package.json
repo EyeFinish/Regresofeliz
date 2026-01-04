@@ -16,7 +16,6 @@
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
-    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "googleapis": "^169.0.0"
   }
