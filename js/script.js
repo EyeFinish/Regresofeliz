@@ -1025,18 +1025,26 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         if (resultado.ok === true) {
             // Enviar notificación por correo
             if (typeof emailjs !== 'undefined') {
-                emailjs.send('service_abc123', 'template_36qwypo', {
-                    to_email: 'soporte.regresofeliz@gmail.com',
-                    nombre_cliente: nombre,
-                    correo_cliente: correo,
-                    telefono_cliente: telefono,
-                    fecha_servicio: fechaReserva,
-                    hora_presentacion: horaPresentacion,
-                    origen: centroEvento,
-                    destino: destinoFinal,
-                    costo_final: `$${costoFinal.toLocaleString('es-CL')}`,
-                    link_google_sheet: 'https://docs.google.com/spreadsheets/d/1DIQGWq6PNK8aER5_KS3xBZ8nKwZHz8kvIKOqIR_Hr0M/edit'
-                }).catch(error => console.error('Error EmailJS:', error));
+                try {
+                    await emailjs.send('service_r0f1jfl', 'template_36qwypo', {
+                        to_email: 'soporte.regresofeliz@gmail.com',
+                        nombre_cliente: nombre,
+                        correo_cliente: correo,
+                        telefono_cliente: telefono,
+                        fecha_servicio: fechaReserva,
+                        hora_presentacion: horaPresentacion,
+                        origen: centroEvento,
+                        destino: destinoFinal,
+                        costo_final: `$${costoFinal.toLocaleString('es-CL')}`,
+                        link_google_sheet: 'https://docs.google.com/spreadsheets/d/1DIQGWq6PNK8aER5_KS3xBZ8nKwZHz8kvIKOqIR_Hr0M/edit'
+                    });
+                    console.log('✅ Correo enviado exitosamente');
+                } catch (error) {
+                    console.error('❌ Error al enviar correo EmailJS:', error);
+                    // Continuar aunque falle el correo
+                }
+            } else {
+                console.warn('⚠️ EmailJS no disponible');
             }
             
             ocultarPantallaCarga();
