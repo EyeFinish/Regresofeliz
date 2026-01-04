@@ -16,6 +16,7 @@ const LUGARES_PREDEFINIDOS = [
     { nombre: 'Centro de Eventos Casona San José', direccion: 'Av. Santa Rosa, La Pintana, Santiago', lat: -33.5856, lon: -70.6344, categoria: 'centro_eventos' },
     { nombre: 'Espacio Riesco', direccion: 'Av. El Salto 5000, Huechuraba, Santiago', lat: -33.3594, lon: -70.6403, categoria: 'centro_eventos' },
     { nombre: 'Centro de Eventos Casona Reina Sur', direccion: 'Camino Longitudinal Sur, San Bernardo', lat: -33.6167, lon: -70.7167, categoria: 'centro_eventos' },
+    { nombre: 'Casona El Rosario', direccion: 'Casona El Rosario, Maipú, Santiago', lat: -33.6262636, lon: -70.7708171, categoria: 'centro_eventos' },
     { nombre: 'Centro de Eventos Punta Cali', direccion: 'Camino El Melocotón, Pirque', lat: -33.6789, lon: -70.5756, categoria: 'centro_eventos' },
     { nombre: 'Centro de Eventos Santa Martina', direccion: 'Camino Padre Hurtado, Peñaflor', lat: -33.6089, lon: -70.9128, categoria: 'centro_eventos' },
     { nombre: 'Haras Los Lingues', direccion: 'Camino Los Lingues, Buin', lat: -33.7389, lon: -70.7456, categoria: 'centro_eventos' },
@@ -1033,7 +1034,8 @@ document.getElementById('reservaForm').addEventListener('submit', async function
                     hora_presentacion: horaPresentacion,
                     origen: centroEvento,
                     destino: destinoFinal,
-                    costo_final: `$${costoFinal.toLocaleString('es-CL')}`
+                    costo_final: `$${costoFinal.toLocaleString('es-CL')}`,
+                    link_google_sheet: 'https://docs.google.com/spreadsheets/d/1DIQGWq6PNK8aER5_KS3xBZ8nKwZHz8kvIKOqIR_Hr0M/edit'
                 }).catch(error => console.error('Error EmailJS:', error));
             }
             
