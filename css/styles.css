@@ -632,7 +632,7 @@ a, button, .card, .feature-card, .caso-card {
 .estadistica-item {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    padding: 15px 25px;
+    padding: 12px 20px;
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     display: flex;
@@ -643,14 +643,14 @@ a, button, .card, .feature-card, .caso-card {
 
 .estadistica-numero {
     color: #000000;
-    font-size: 2em;
+    font-size: 1.6em;
     font-weight: 700;
     line-height: 1;
 }
 
 .estadistica-label {
     color: #000000;
-    font-size: 0.9em;
+    font-size: 0.8em;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -658,15 +658,15 @@ a, button, .card, .feature-card, .caso-card {
 
 .nube-pensamiento {
     position: absolute;
-    top: 50%;
-    right: -100px;
+    top: 70%;
+    right: 20px;
     transform: translateY(-50%);
     z-index: 15;
 }
 
 .nube-contenido {
     background: #FFFFFF;
-    padding: 25px 30px;
+    padding: 20px 25px;
     border-radius: 50px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     position: relative;
@@ -700,9 +700,9 @@ a, button, .card, .feature-card, .caso-card {
 
 .nube-contenido p {
     color: #000000;
-    font-size: 1.3em;
+    font-size: 1.1em;
     font-weight: 700;
-    margin: 0 0 15px 0;
+    margin: 0 0 12px 0;
     text-align: center;
 }
 
@@ -710,11 +710,11 @@ a, button, .card, .feature-card, .caso-card {
     display: inline-block;
     background: #00BFFF;
     color: #FFFFFF;
-    padding: 12px 25px;
+    padding: 10px 20px;
     border-radius: 25px;
     text-decoration: none;
     font-weight: 600;
-    font-size: 1em;
+    font-size: 0.9em;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 191, 255, 0.4);
 }
@@ -736,7 +736,7 @@ a, button, .card, .feature-card, .caso-card {
 
 .que-es-imagen img {
     width: 100%;
-    max-width: 350px;
+    max-width: 280px;
     height: auto;
     border-radius: 15px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
