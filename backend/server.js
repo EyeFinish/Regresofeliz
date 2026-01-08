@@ -685,15 +685,9 @@ app.get('/mensaje/:id', (req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n🚀 Servidor RegresoFeliz iniciado correctamente`);
     console.log(`📡 Escuchando en http://localhost:${PORT}`);
     console.log(`📊 Las cotizaciones se guardan en Google Sheets`);
     console.log(`🔗 https://docs.google.com/spreadsheets/d/1DIQGWq6PNK8aER5_KS3xBZ8nKwZHz8kvIKOqIR_Hr0M\n`);
-    
-    // Abrir navegador automáticamente solo en desarrollo local
-    if (process.env.NODE_ENV !== 'production') {
-        const url = `http://localhost:${PORT}`;
-        require('child_process').exec(`start ${url}`);
-    }
 });
