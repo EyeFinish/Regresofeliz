@@ -1,0 +1,22 @@
+# robots.txt para regresofeliz.com
+# Configuración para permitir el rastreo de Google y otros motores de búsqueda
+
+User-agent: *
+Allow: /
+
+# Páginas permitidas específicamente
+Allow: /index.html
+Allow: /formulario.html
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+
+# Bloquear páginas que no deben indexarse
+Disallow: /backend/
+Disallow: /*.json$
+
+# Sitemap
+Sitemap: https://regresofeliz.com/sitemap.xml
+
+# Rastreo optimizado
+Crawl-delay: 1
