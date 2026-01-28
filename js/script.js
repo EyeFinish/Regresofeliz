@@ -20,6 +20,7 @@ const LUGARES_PREDEFINIDOS = [
     { nombre: 'Centro de Eventos Punta Cali', direccion: 'Camino El Melocotón, Pirque', lat: -33.6789, lon: -70.5756, categoria: 'centro_eventos' },
     { nombre: 'Centro de Eventos Santa Martina', direccion: 'Camino Padre Hurtado, Peñaflor', lat: -33.6089, lon: -70.9128, categoria: 'centro_eventos' },
     { nombre: 'Haras Los Lingues', direccion: 'Camino Los Lingues, Buin', lat: -33.7389, lon: -70.7456, categoria: 'centro_eventos' },
+    { nombre: 'Entre Nogales', direccion: 'Entre Nogales, Buin, Región Metropolitana', lat: -33.7142557, lon: -70.769195, categoria: 'centro_eventos' },
     { nombre: 'Club Hípico de Santiago', direccion: 'Av. Blanco Encalada 2540, Santiago Centro', lat: -33.4689, lon: -70.6833, categoria: 'centro_eventos' },
     { nombre: 'Movistar Arena', direccion: 'Av. Beauchef 1204, Santiago', lat: -33.4656, lon: -70.6833, categoria: 'centro_eventos' },
     { nombre: 'Casa Granada', direccion: 'Sector Las Lilas 22, Chada, Paine', lat: -33.8914, lon: -70.7119, categoria: 'centro_eventos' },
