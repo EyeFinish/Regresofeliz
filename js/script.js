@@ -1,6 +1,5 @@
 // MAPBOX CONFIGURATION
-// El token se carga desde config.js (no se sube a GitHub por seguridad)
-const MAPBOX_TOKEN = CONFIG.MAPBOX_TOKEN;
+const MAPBOX_TOKEN = 'pk.eyJ1IjoicmVncmVzb2ZlbGl6IiwiYSI6ImNtajNjNXVnMDE1OTMzcHB6ZzBiMWx1dXIifQ.W2JNrM712264cNmKX5a8iw';
 
 // EMAILJS CONFIGURATION
 (function() {
