@@ -17,6 +17,9 @@ Thumbs.db
 augmented-clock-*.json
 *service-account*.json
 
+# Configuración de API Keys (NO SUBIR)
+js/config.js
+
 # Node modules
 node_modules/
 backend/node_modules/
