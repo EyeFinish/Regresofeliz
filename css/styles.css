@@ -325,7 +325,7 @@ a, button, .card, .feature-card, .caso-card {
     padding: 60px 20px;
     background: 
         linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-        url('../fotofondo.png') center/cover no-repeat;
+        url('../assets/fotofondo.png') center/cover no-repeat;
     position: relative;
 }
 
