@@ -1,5 +1,5 @@
-// MAPBOX CONFIGURATION
-const MAPBOX_TOKEN = 'pk.eyJ1IjoicmVncmVzb2ZlbGl6IiwiYSI6ImNtajNjNXVnMDE1OTMzcHB6ZzBiMWx1dXIifQ.W2JNrM712264cNmKX5a8iw';
+// GOOGLE MAPS CONFIGURATION
+const GOOGLE_MAPS_KEY = 'AIzaSyAJHbQQKXiVFRJQ1SFxhECqBscQ59fCptA';
 
 // EMAILJS CONFIGURATION
 (function() {
@@ -41,15 +41,18 @@ const LUGARES_PREDEFINIDOS = [
     { nombre: 'Camino Las Encinas', direccion: 'Cam. Las Encinas, Pirque, Región Metropolitana', lat: -33.7159061, lon: -70.5636266, categoria: 'centro_eventos' }
 ];
 
-// Variables globales para Leaflet y Mapbox
+// Variables globales para Google Maps
 let map;
 let origenMarker = null;
 let destinoMarker = null;
-let routeLayer = null;
+let directionsRenderer = null;
 let origenCoords = null;
 let destinoCoords = null;
 let paradasAdicionales = []; // Array para almacenar paradas adicionales
 let paradaMarkers = []; // Array para los marcadores de paradas
+let geocoder = null;
+let placesService = null;
+let directionsService = null;
 
 // Constantes de precio
 const PRECIO_BASE = 25000;
@@ -93,12 +96,12 @@ function configurarToggleMapa() {
         
         if (mapaActivo) {
             // Activar interacciones
-            map.dragging.enable();
-            map.scrollWheelZoom.enable();
-            map.doubleClickZoom.enable();
-            map.touchZoom.enable();
-            map.boxZoom.enable();
-            map.keyboard.enable();
+            map.setOptions({
+                draggable: true,
+                scrollwheel: true,
+                disableDoubleClickZoom: false,
+                gestureHandling: 'auto'
+            });
             
             // Cambiar estilos
             mapDiv.classList.remove('map-locked');
@@ -107,12 +110,12 @@ function configurarToggleMapa() {
             toggleBtn.classList.add('map-active-btn');
         } else {
             // Desactivar interacciones
-            map.dragging.disable();
-            map.scrollWheelZoom.disable();
-            map.doubleClickZoom.disable();
-            map.touchZoom.disable();
-            map.boxZoom.disable();
-            map.keyboard.disable();
+            map.setOptions({
+                draggable: false,
+                scrollwheel: false,
+                disableDoubleClickZoom: true,
+                gestureHandling: 'none'
+            });
             
             // Cambiar estilos
             mapDiv.classList.remove('map-active');
@@ -184,42 +187,25 @@ function configurarParadasAdicionales() {
 async function buscarLugarParada(query, contenedorSugerencias, index) {
     try {
         const resultadosLocales = buscarEnBaseDatosLocal(query);
-        const promesaMapbox = buscarEnMapbox(query);
+        const promesaGoogle = buscarEnGooglePlaces(query);
         
         if (resultadosLocales.length > 0) {
-            const resultadosMapbox = await promesaMapbox;
-            const todosCombinados = [...resultadosLocales, ...resultadosMapbox];
+            const resultadosGoogle = await promesaGoogle;
+            const todosCombinados = [...resultadosLocales, ...resultadosGoogle];
             const unicos = eliminarDuplicados(todosCombinados);
             mostrarSugerenciasParada(unicos, contenedorSugerencias, index);
             return;
         }
         
-        const resultadosMapbox = await promesaMapbox;
+        const resultadosGoogle = await promesaGoogle;
         
-        if (resultadosMapbox.length > 0) {
-            mostrarSugerenciasParada(resultadosMapbox, contenedorSugerencias, index);
+        if (resultadosGoogle.length > 0) {
+            mostrarSugerenciasParada(resultadosGoogle, contenedorSugerencias, index);
             return;
         }
         
-        await buscarLugarNominatimParada(query, contenedorSugerencias, index);
+        mostrarSugerenciasParada([], contenedorSugerencias, index);
         
-    } catch (error) {
-        await buscarLugarNominatimParada(query, contenedorSugerencias, index);
-    }
-}
-
-// Búsqueda con Nominatim para parada
-async function buscarLugarNominatimParada(query, contenedorSugerencias, index) {
-    try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)},Chile&limit=5&addressdetails=1`;
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': 'RegresoFeliz/1.0'
-            }
-        });
-        const lugares = await response.json();
-        
-        mostrarSugerenciasParada(lugares, contenedorSugerencias, index);
     } catch (error) {
         mostrarSugerenciasParada([], contenedorSugerencias, index);
     }
@@ -259,6 +245,23 @@ function mostrarSugerenciasParada(lugares, contenedor, index) {
 
 // Seleccionar lugar para parada adicional
 function seleccionarLugarParada(lugar, index) {
+    // Si es un resultado de Google Places (sin coordenadas), resolver placeId
+    if (!lugar.esLocal && lugar.placeId && !lugar.lat) {
+        geocoder.geocode({ placeId: lugar.placeId }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+                const location = results[0].geometry.location;
+                lugar.lat = location.lat();
+                lugar.lon = location.lng();
+                aplicarSeleccionParada(lugar, index);
+            }
+        });
+    } else {
+        aplicarSeleccionParada(lugar, index);
+    }
+}
+
+// Aplicar la selección de parada al mapa
+function aplicarSeleccionParada(lugar, index) {
     const coords = {
         lat: parseFloat(lugar.lat),
         lng: parseFloat(lugar.lon)
@@ -276,21 +279,23 @@ function seleccionarLugarParada(lugar, index) {
     
     // Eliminar marcador anterior si existe
     if (paradasAdicionales[index].marker) {
-        map.removeLayer(paradasAdicionales[index].marker);
+        paradasAdicionales[index].marker.setMap(null);
     }
     
-    // Agregar marcador al mapa (usar color diferente para paradas)
-    const marker = L.marker([coords.lat, coords.lng], {
+    // Agregar marcador al mapa (color naranja para paradas)
+    const marker = new google.maps.Marker({
+        position: coords,
+        map: map,
         title: `Parada ${index + 1}`,
-        icon: L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        })
-    }).addTo(map).bindPopup(`Parada ${index + 1}`).openPopup();
+        icon: {
+            url: 'https://maps.google.com/mapfiles/ms/icons/orange-dot.png'
+        }
+    });
+    
+    const infoWindow = new google.maps.InfoWindow({
+        content: `Parada ${index + 1}`
+    });
+    infoWindow.open(map, marker);
     
     paradasAdicionales[index].marker = marker;
     // Recalcular ruta si hay origen y destino
@@ -308,7 +313,7 @@ function eliminarParada(index) {
     
     // Eliminar marcador del mapa
     if (paradasAdicionales[index] && paradasAdicionales[index].marker) {
-        map.removeLayer(paradasAdicionales[index].marker);
+        paradasAdicionales[index].marker.setMap(null);
     }
     
     // Marcar como eliminada (no eliminar del array para mantener índices)
@@ -321,31 +326,38 @@ function eliminarParada(index) {
     }
 }
 
-// Inicializar el mapa con Mapbox
+// Inicializar el mapa con Google Maps
 function inicializarMapa() {
     // Crear mapa centrado en Santiago, Chile con interacciones desactivadas
-    map = L.map('map', {
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        zoomControl: true
-    }).setView([-33.4489, -70.6693], 12);
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -33.4489, lng: -70.6693 },
+        zoom: 12,
+        draggable: false,
+        scrollwheel: false,
+        disableDoubleClickZoom: true,
+        gestureHandling: 'none',
+        zoomControl: true,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
+    });
     
-    // Agregar capa de Mapbox (mucho más precisa)
-    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-        attribution: '© <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 19,
-        id: 'mapbox/streets-v12',
-        tileSize: 512,
-        zoomOffset: -1,
-        accessToken: MAPBOX_TOKEN
-    }).addTo(map);
+    // Inicializar servicios de Google Maps
+    geocoder = new google.maps.Geocoder();
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        map: map,
+        suppressMarkers: true,
+        polylineOptions: {
+            strokeColor: '#667eea',
+            strokeWeight: 6,
+            strokeOpacity: 0.8
+        }
+    });
+    placesService = new google.maps.places.AutocompleteService();
 }
 
-// Configurar autocompletado con Nominatim (OpenStreetMap)
+// Configurar autocompletado con Google Places
 function configurarAutocompletado() {
     let timeoutOrigen, timeoutDestino;
     
@@ -404,38 +416,35 @@ function configurarAutocompletado() {
     });
 }
 
-// Buscar lugares - Sistema Híbrido (Base de datos local + Mapbox + Nominatim)
+// Buscar lugares - Sistema Híbrido (Base de datos local + Google Places)
 async function buscarLugar(query, contenedorSugerencias, esOrigen) {
     try {
         // PASO 1: Buscar en base de datos local (instantáneo)
         const resultadosLocales = buscarEnBaseDatosLocal(query);
-        // PASO 2: Buscar en Mapbox (en paralelo)
-        const promesaMapbox = buscarEnMapbox(query);
+        // PASO 2: Buscar en Google Places (en paralelo)
+        const promesaGoogle = buscarEnGooglePlaces(query);
         
-        // Si hay resultados locales, mostrarlos inmediatamente
+        // Si hay resultados locales, combinar con Google
         if (resultadosLocales.length > 0) {
-            const resultadosMapbox = await promesaMapbox;
-            const todosCombinados = [...resultadosLocales, ...resultadosMapbox];
-            // Eliminar duplicados por nombre similar
+            const resultadosGoogle = await promesaGoogle;
+            const todosCombinados = [...resultadosLocales, ...resultadosGoogle];
             const unicos = eliminarDuplicados(todosCombinados);
             mostrarSugerencias(unicos, contenedorSugerencias, esOrigen);
             return;
         }
         
-        // Si no hay resultados locales, esperar Mapbox
-        const resultadosMapbox = await promesaMapbox;
+        // Si no hay resultados locales, usar Google Places
+        const resultadosGoogle = await promesaGoogle;
         
-        if (resultadosMapbox.length > 0) {
-            mostrarSugerencias(resultadosMapbox, contenedorSugerencias, esOrigen);
+        if (resultadosGoogle.length > 0) {
+            mostrarSugerencias(resultadosGoogle, contenedorSugerencias, esOrigen);
             return;
         }
         
-        // PASO 3: Si Mapbox no encuentra nada, usar Nominatim como último recurso
-        console.log('🔄 Usando búsqueda alternativa (Nominatim)...');
-        await buscarLugarNominatim(query, contenedorSugerencias, esOrigen);
+        mostrarSugerencias([], contenedorSugerencias, esOrigen);
         
     } catch (error) {
-        await buscarLugarNominatim(query, contenedorSugerencias, esOrigen);
+        mostrarSugerencias([], contenedorSugerencias, esOrigen);
     }
 }
 
@@ -454,49 +463,46 @@ function buscarEnBaseDatosLocal(query) {
             lat: lugar.lat,
             lon: lugar.lon,
             nombre: lugar.nombre,
-            esLocal: true // Marcar como resultado local
+            esLocal: true
         }))
-        .slice(0, 3); // Máximo 3 resultados locales
+        .slice(0, 3);
 }
 
-// Buscar en Mapbox
-async function buscarEnMapbox(query) {
-    try {
-        let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&country=CL&language=es&limit=5&proximity=-70.6693,-33.4489&types=place,address,poi,locality,neighborhood`;
+// Buscar en Google Places Autocomplete
+async function buscarEnGooglePlaces(query) {
+    return new Promise((resolve) => {
+        if (!placesService) {
+            resolve([]);
+            return;
+        }
         
-        let response = await fetch(url);
-        
-        if (!response.ok) {
-            if (response.status === 401) {
-                return [];
+        placesService.getPlacePredictions({
+            input: query,
+            componentRestrictions: { country: 'cl' },
+            language: 'es',
+            locationBias: {
+                center: { lat: -33.4489, lng: -70.6693 },
+                radius: 100000
             }
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        let data = await response.json();
-        
-        // Si no hay resultados, intentar búsqueda más amplia
-        if (!data.features || data.features.length === 0) {
-            url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&country=CL&language=es&limit=5&proximity=-70.6693,-33.4489`;
-            response = await fetch(url);
-            data = await response.json();
-        }
-        
-        if (!data.features || data.features.length === 0) {
-            return [];
-        }
-        
-        return data.features.map(feature => ({
-            display_name: feature.place_name,
-            lat: feature.center[1],
-            lon: feature.center[0],
-            nombre: feature.text,
-            esLocal: false
-        }));
-        
-    } catch (error) {
-        return [];
-    }
+        }, (predictions, status) => {
+            if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
+                resolve([]);
+                return;
+            }
+            
+            const resultados = predictions.map(prediction => ({
+                display_name: prediction.description,
+                nombre: prediction.structured_formatting.main_text,
+                placeId: prediction.place_id,
+                esLocal: false,
+                // lat/lon se resolverán al seleccionar
+                lat: null,
+                lon: null
+            }));
+            
+            resolve(resultados);
+        });
+    });
 }
 
 // Eliminar duplicados por similitud de nombres
@@ -510,25 +516,6 @@ function eliminarDuplicados(lugares) {
         vistos.add(clave);
         return true;
     });
-}
-
-// Búsqueda alternativa con Nominatim (OpenStreetMap)
-async function buscarLugarNominatim(query, contenedorSugerencias, esOrigen) {
-    try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)},Chile&limit=5&addressdetails=1`;
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': 'RegresoFeliz/1.0'
-            }
-        });
-        const lugares = await response.json();
-        if (lugares.length === 0) {
-        }
-        
-        mostrarSugerencias(lugares, contenedorSugerencias, esOrigen);
-    } catch (error) {
-        mostrarSugerencias([], contenedorSugerencias, esOrigen);
-    }
 }
 
 // Mostrar sugerencias de lugares
@@ -566,6 +553,23 @@ function mostrarSugerencias(lugares, contenedor, esOrigen) {
 
 // Seleccionar un lugar
 function seleccionarLugar(lugar, esOrigen) {
+    // Si es un resultado de Google Places (sin coordenadas), resolver placeId
+    if (!lugar.esLocal && lugar.placeId && !lugar.lat) {
+        geocoder.geocode({ placeId: lugar.placeId }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+                const location = results[0].geometry.location;
+                lugar.lat = location.lat();
+                lugar.lon = location.lng();
+                aplicarSeleccion(lugar, esOrigen);
+            }
+        });
+    } else {
+        aplicarSeleccion(lugar, esOrigen);
+    }
+}
+
+// Aplicar la selección del lugar al mapa
+function aplicarSeleccion(lugar, esOrigen) {
     const coords = {
         lat: parseFloat(lugar.lat),
         lng: parseFloat(lugar.lon)
@@ -585,11 +589,19 @@ function seleccionarLugar(lugar, esOrigen) {
         
         // Agregar o actualizar marcador de origen
         if (origenMarker) {
-            map.removeLayer(origenMarker);
+            origenMarker.setMap(null);
         }
-        origenMarker = L.marker([coords.lat, coords.lng], {
-            title: 'Centro de Evento'
-        }).addTo(map).bindPopup('Centro de Evento').openPopup();
+        origenMarker = new google.maps.Marker({
+            position: coords,
+            map: map,
+            title: 'Centro de Evento',
+            icon: {
+                url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
+            }
+        });
+        
+        const infoOrigen = new google.maps.InfoWindow({ content: 'Centro de Evento' });
+        infoOrigen.open(map, origenMarker);
     } else {
         destinoFinalInput.value = lugar.display_name;
         destinoCoords = coords;
@@ -604,11 +616,19 @@ function seleccionarLugar(lugar, esOrigen) {
         
         // Agregar o actualizar marcador de destino
         if (destinoMarker) {
-            map.removeLayer(destinoMarker);
+            destinoMarker.setMap(null);
         }
-        destinoMarker = L.marker([coords.lat, coords.lng], {
-            title: 'Destino Final'
-        }).addTo(map).bindPopup('Destino Final').openPopup();
+        destinoMarker = new google.maps.Marker({
+            position: coords,
+            map: map,
+            title: 'Destino Final',
+            icon: {
+                url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+            }
+        });
+        
+        const infoDestino = new google.maps.InfoWindow({ content: 'Destino Final' });
+        infoDestino.open(map, destinoMarker);
     }
     
     // Si ambos están seleccionados, calcular ruta
@@ -617,50 +637,34 @@ function seleccionarLugar(lugar, esOrigen) {
     }
 }
 
-// Calcular y mostrar la mejor ruta usando Mapbox Directions API
+// Calcular y mostrar la mejor ruta usando Google Maps Directions API
 async function calcularRuta() {
     if (!origenCoords || !destinoCoords) {
         return;
     }
-    let waypoints = `${origenCoords.lng},${origenCoords.lat}`;
-    waypoints += `;${destinoCoords.lng},${destinoCoords.lat}`;
     
     // Obtener paradas válidas para el costo adicional (no afectan kilómetros)
     const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
-    try {
-        const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${waypoints}?alternatives=false&geometries=geojson&steps=false&overview=full&access_token=${MAPBOX_TOKEN}`;
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-            return await calcularRutaOSRM();
-        }
-        
-        const data = await response.json();
-        
-        if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
-            const route = data.routes[0];
+    
+    const request = {
+        origin: new google.maps.LatLng(origenCoords.lat, origenCoords.lng),
+        destination: new google.maps.LatLng(destinoCoords.lat, destinoCoords.lng),
+        travelMode: google.maps.TravelMode.DRIVING,
+        unitSystem: google.maps.UnitSystem.METRIC,
+        region: 'cl'
+    };
+    
+    directionsService.route(request, (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+            // Dibujar la ruta en el mapa
+            directionsRenderer.setDirections(result);
             
-            // Limpiar ruta anterior si existe
-            if (routeLayer) {
-                map.removeLayer(routeLayer);
-            }
+            const route = result.routes[0];
+            const leg = route.legs[0];
             
-            // Dibujar la mejor ruta en el mapa
-            const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
-            routeLayer = L.polyline(coordinates, {
-                color: '#667eea',
-                weight: 6,
-                opacity: 0.8,
-                lineJoin: 'round',
-                lineCap: 'round'
-            }).addTo(map);
-            
-            // Ajustar vista del mapa para mostrar toda la ruta con padding
-            map.fitBounds(routeLayer.getBounds(), { padding: [80, 80] });
-            
-            // Calcular distancia, duración y costo (incluyendo paradas adicionales)
-            const distanciaKm = (route.distance / 1000).toFixed(2);
-            const duracionMin = Math.round(route.duration / 60);
+            // Calcular distancia y duración
+            const distanciaKm = (leg.distance.value / 1000).toFixed(2);
+            const duracionMin = Math.round(leg.duration.value / 60);
             const costoBase = PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM);
             const costoParadas = paradasValidas.length * COSTO_PARADA_ADICIONAL;
             const costoSinRedondeo = costoBase + costoParadas;
@@ -685,75 +689,7 @@ async function calcularRuta() {
         } else {
             mostrarMensaje('No se pudo calcular la ruta. Verifica las ubicaciones.', 'error');
         }
-    } catch (error) {
-        // Fallback a OSRM si Mapbox falla
-        await calcularRutaOSRM();
-    }
-}
-
-// Calcular ruta con OSRM (Open Source Routing Machine) como fallback
-async function calcularRutaOSRM() {
-    try {
-        // SOLO calcular ruta entre origen y destino (sin paradas para el cálculo de km)
-        let waypoints = `${origenCoords.lng},${origenCoords.lat}`;
-        waypoints += `;${destinoCoords.lng},${destinoCoords.lat}`;
-        
-        // Obtener paradas válidas para el costo adicional (no afectan kilómetros)
-        const paradasValidas = paradasAdicionales.filter(p => p !== null && p.coords !== null);
-        
-        const url = `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson`;
-        
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
-            const route = data.routes[0];
-            
-            // Dibujar ruta en el mapa
-            if (routeLayer) {
-                map.removeLayer(routeLayer);
-            }
-            
-            const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
-            routeLayer = L.polyline(coordinates, {
-                color: '#667eea',
-                weight: 5,
-                opacity: 0.7
-            }).addTo(map);
-            
-            // Ajustar vista del mapa para mostrar toda la ruta
-            map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
-            
-            // Calcular distancia, duración y costo (incluyendo paradas adicionales)
-            const distanciaKm = (route.distance / 1000).toFixed(2);
-            const duracionMin = Math.round(route.duration / 60);
-            const costoBase = PRECIO_BASE + (parseFloat(distanciaKm) * COSTO_POR_KM);
-            const costoParadas = paradasValidas.length * COSTO_PARADA_ADICIONAL;
-            const costoSinRedondeo = costoBase + costoParadas;
-            // Redondear hacia abajo al múltiplo de 1000 y restar 10 (ej: 40.878 → 39.990)
-            const costoTotal = Math.floor(costoSinRedondeo / 1000) * 1000 - 10;
-            
-            // Guardar valores solo en variables globales para WhatsApp
-            window._cotizacion_costo = costoTotal;
-            window._cotizacion_distancia = distanciaKm;
-            window._cotizacion_duracion = duracionMin;
-            window._cotizacion_num_paradas = paradasValidas.length;
-            window._cotizacion_costo_paradas = costoParadas;
-            console.log('📊 Detalles de cotización:', { 
-                distancia: distanciaKm + ' km', 
-                duracion: duracionMin + ' min', 
-                costoBase: '$' + costoBase.toLocaleString('es-CL'),
-                paradas: paradasValidas.length,
-                costoParadas: '$' + costoParadas.toLocaleString('es-CL'),
-                costoTotal: '$' + costoTotal.toLocaleString('es-CL'),
-                formularioListoParaEnviar: true
-            });
-        } else {
-            mostrarMensaje('No se pudo calcular la ruta. Verifica las ubicaciones.', 'error');
-        }
-    } catch (error) {
-        mostrarMensaje('Error al calcular la ruta. Intenta nuevamente.', 'error');
-    }
+    });
 }
 
 // Validación de formato de patente (ejemplo para formato chileno)
