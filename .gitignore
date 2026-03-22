@@ -19,6 +19,8 @@ augmented-clock-*.json
 
 # Configuración de API Keys (NO SUBIR)
 js/config.js
+.env
+backend/.env
 
 # Node modules
 node_modules/

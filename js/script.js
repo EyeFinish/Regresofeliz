@@ -1,5 +1,5 @@
-// GOOGLE MAPS CONFIGURATION
-const GOOGLE_MAPS_KEY = 'AIzaSyAJHbQQKXiVFRJQ1SFxhECqBscQ59fCptA';
+// GOOGLE MAPS CONFIGURATION - Key se carga desde el backend
+let GOOGLE_MAPS_KEY = '';
 
 // EMAILJS CONFIGURATION
 (function() {
@@ -67,14 +67,47 @@ const destinoFinalInput = document.getElementById('destinoFinal');
 const sugerenciasOrigen = document.getElementById('sugerencias-origen');
 const sugerenciasDestino = document.getElementById('sugerencias-destino');
 
+// Cargar Google Maps dinámicamente con la key del backend
+function cargarGoogleMaps(apiKey) {
+    return new Promise((resolve, reject) => {
+        if (window.google && window.google.maps) {
+            resolve();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=es&region=CL`;
+        script.async = true;
+        script.defer = true;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('No se pudo cargar Google Maps'));
+        document.head.appendChild(script);
+    });
+}
+
 // Botón volver al inicio (solo en index.html)
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const btnVolverInicio = document.getElementById('btnVolverInicio');
     
     if (btnVolverInicio) {
         btnVolverInicio.addEventListener('click', function() {
             window.location.href = 'index.html';
         });
+    }
+    
+    // Obtener API Key desde el backend y cargar Google Maps
+    try {
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_URL = isLocal ? 'http://localhost:3000' : 'https://regresofeliz.onrender.com';
+        const resp = await fetch(`${API_URL}/api/maps-key`);
+        const data = await resp.json();
+        if (data.ok && data.key) {
+            GOOGLE_MAPS_KEY = data.key;
+            await cargarGoogleMaps(GOOGLE_MAPS_KEY);
+        } else {
+            console.error('No se pudo obtener la API Key de Google Maps');
+        }
+    } catch (error) {
+        console.error('Error al cargar Google Maps:', error);
     }
     
     // Inicializar componentes del formulario

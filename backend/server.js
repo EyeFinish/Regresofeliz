@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -448,6 +449,15 @@ function formatearFechaChilena(fecha) {
 }
 
 
+
+// Endpoint para obtener la API Key de Google Maps (no expuesta en GitHub)
+app.get('/api/maps-key', (req, res) => {
+    const key = process.env.GOOGLE_MAPS_KEY || '';
+    if (!key) {
+        return res.status(500).json({ ok: false, mensaje: 'API Key de Google Maps no configurada' });
+    }
+    res.json({ ok: true, key });
+});
 
 // Endpoint para recibir cotizaciones
 app.post('/api/cotizacion', async (req, res) => {
