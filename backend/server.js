@@ -470,19 +470,23 @@ async function guardarEnGoogleSheets(datos) {
     }
 }
 
-// Middlewares - CORS explícito para permitir regresofeliz.com
+// Middlewares - CORS
 app.use(cors({
-    origin: [
-        'https://regresofeliz.com',
-        'https://www.regresofeliz.com',
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'http://localhost:5500',
-        'http://127.0.0.1:5500'
-    ],
+    origin: function(origin, callback) {
+        // Permitir requests sin origin (Postman, curl, etc)
+        if (!origin) return callback(null, true);
+        // Permitir producción
+        if (origin === 'https://regresofeliz.com' || origin === 'https://www.regresofeliz.com') {
+            return callback(null, true);
+        }
+        // Permitir cualquier localhost/127.0.0.1 en desarrollo
+        if (origin.match(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/)) {
+            return callback(null, true);
+        }
+        callback(new Error('CORS not allowed'));
+    },
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
-    credentials: true
+    allowedHeaders: ['Content-Type']
 }));
 
 // Middleware para loggear todas las peticiones
