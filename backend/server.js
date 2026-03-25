@@ -147,9 +147,23 @@ async function guardarEnGoogleSheets(datos) {
         const tieneColumnaComunicacion = encabezadosExistentes[27] && encabezadosExistentes[27].includes('MENSAJE');
         const necesitaActualizacion = !result.data.values || result.data.values.length === 0 || encabezadosExistentes.length < 29 || !tieneColumnaComunicacion;
         
+        // Verificar si hay filtro activo
+        let necesitaFiltro = true;
+        try {
+            const sheetMeta = await sheets.spreadsheets.get({
+                spreadsheetId: SPREADSHEET_ID,
+                fields: 'sheets.basicFilter'
+            });
+            if (sheetMeta.data.sheets && sheetMeta.data.sheets[0] && sheetMeta.data.sheets[0].basicFilter) {
+                necesitaFiltro = false;
+            }
+        } catch (e) {
+            // Si falla, asumimos que necesita filtro
+        }
+        
         // Si no hay encabezados o están incompletos, crearlos/actualizarlos y formatear
-        if (necesitaActualizacion) {
-            console.log('📝 Actualizando encabezados de Google Sheets... (Columnas actuales: ' + encabezadosExistentes.length + ')');
+        if (necesitaActualizacion || necesitaFiltro) {
+            console.log('📝 Actualizando encabezados y diseño RegresoFeliz... (Columnas actuales: ' + encabezadosExistentes.length + ', Filtro: ' + (necesitaFiltro ? 'necesario' : 'ok') + ')');
             // Crear encabezados
             await sheets.spreadsheets.values.update({
                 spreadsheetId: SPREADSHEET_ID,
@@ -173,30 +187,34 @@ async function guardarEnGoogleSheets(datos) {
                 }
             });
             
-            // Formatear encabezados
+            // Formatear encabezados - Colores RegresoFeliz
+            // #00BFFF (celeste) = {r:0, g:0.749, b:1}
+            // #0080FF (azul)    = {r:0, g:0.502, b:1}
+            // #40E0D0 (turquesa)= {r:0.251, g:0.878, b:0.816}
+            // Light bg           = {r:0.902, g:0.969, b:1} (#E6F7FF)
             const headerFormats = [
-                // Columnas A-C (Fechas) - Azul claro
-                { range: 'A1:C1', backgroundColor: { red: 0.8, green: 0.9, blue: 1 } },
-                // Columna D (Separador Cliente) - Morado
-                { range: 'D1', backgroundColor: { red: 0.6, green: 0.4, blue: 0.9 } },
-                // Columnas E-H (Cliente) - Verde claro
-                { range: 'E1:H1', backgroundColor: { red: 0.8, green: 1, blue: 0.8 } },
-                // Columna I (Separador Viaje) - Morado
-                { range: 'I1', backgroundColor: { red: 0.6, green: 0.4, blue: 0.9 } },
-                // Columnas J-P (Viaje) - Amarillo claro
-                { range: 'J1:P1', backgroundColor: { red: 1, green: 1, blue: 0.8 } },
-                // Columna Q (Separador Vehículo) - Morado
-                { range: 'Q1', backgroundColor: { red: 0.6, green: 0.4, blue: 0.9 } },
-                // Columnas R-U (Vehículo) - Naranja claro
-                { range: 'R1:U1', backgroundColor: { red: 1, green: 0.9, blue: 0.7 } },
-                // Columna V (Separador Cotización) - Morado
-                { range: 'V1', backgroundColor: { red: 0.6, green: 0.4, blue: 0.9 } },
-                // Columnas W-Z (Cotización) - Rosa claro
-                { range: 'W1:Z1', backgroundColor: { red: 1, green: 0.8, blue: 0.9 } },
-                // Columna AA (Separador Comunicación) - Morado
-                { range: 'AA1', backgroundColor: { red: 0.6, green: 0.4, blue: 0.9 } },
-                // Columnas AB-AC (Comunicación) - Azul cielo
-                { range: 'AB1:AC1', backgroundColor: { red: 0.7, green: 0.9, blue: 1 } }
+                // Columnas A-C (Fechas) - Azul RegresoFeliz
+                { range: 'A1:C1', backgroundColor: { red: 0, green: 0.502, blue: 1 } },
+                // Columna D (Separador Cliente) - Turquesa
+                { range: 'D1', backgroundColor: { red: 0.251, green: 0.878, blue: 0.816 } },
+                // Columnas E-H (Cliente) - Celeste RegresoFeliz
+                { range: 'E1:H1', backgroundColor: { red: 0, green: 0.749, blue: 1 } },
+                // Columna I (Separador Viaje) - Turquesa
+                { range: 'I1', backgroundColor: { red: 0.251, green: 0.878, blue: 0.816 } },
+                // Columnas J-P (Viaje) - Azul RegresoFeliz
+                { range: 'J1:P1', backgroundColor: { red: 0, green: 0.502, blue: 1 } },
+                // Columna Q (Separador Vehículo) - Turquesa
+                { range: 'Q1', backgroundColor: { red: 0.251, green: 0.878, blue: 0.816 } },
+                // Columnas R-U (Vehículo) - Celeste RegresoFeliz
+                { range: 'R1:U1', backgroundColor: { red: 0, green: 0.749, blue: 1 } },
+                // Columna V (Separador Cotización) - Turquesa
+                { range: 'V1', backgroundColor: { red: 0.251, green: 0.878, blue: 0.816 } },
+                // Columnas W-Z (Cotización) - Azul RegresoFeliz
+                { range: 'W1:Z1', backgroundColor: { red: 0, green: 0.502, blue: 1 } },
+                // Columna AA (Separador Comunicación) - Turquesa
+                { range: 'AA1', backgroundColor: { red: 0.251, green: 0.878, blue: 0.816 } },
+                // Columnas AB-AC (Comunicación) - Celeste RegresoFeliz
+                { range: 'AB1:AC1', backgroundColor: { red: 0, green: 0.749, blue: 1 } }
             ];
             
             const requests = headerFormats.map(format => ({
@@ -213,7 +231,11 @@ async function guardarEnGoogleSheets(datos) {
                     cell: {
                         userEnteredFormat: {
                             backgroundColor: format.backgroundColor,
-                            textFormat: { bold: true, fontSize: 10 },
+                            textFormat: { 
+                                bold: true, 
+                                fontSize: 10,
+                                foregroundColor: { red: 1, green: 1, blue: 1 }
+                            },
                             horizontalAlignment: 'CENTER',
                             verticalAlignment: 'MIDDLE'
                         }
@@ -233,7 +255,7 @@ async function guardarEnGoogleSheets(datos) {
                 }
             });
             
-            // Agregar bordes gruesos para los encabezados
+            // Agregar bordes gruesos para los encabezados (azul oscuro RegresoFeliz)
             requests.push({
                 updateBorders: {
                     range: {
@@ -246,32 +268,32 @@ async function guardarEnGoogleSheets(datos) {
                     top: {
                         style: 'SOLID_THICK',
                         width: 2,
-                        color: { red: 0.2, green: 0.2, blue: 0.2 }
+                        color: { red: 0, green: 0.3, blue: 0.7 }
                     },
                     bottom: {
                         style: 'SOLID_THICK',
                         width: 2,
-                        color: { red: 0.2, green: 0.2, blue: 0.2 }
+                        color: { red: 0, green: 0.3, blue: 0.7 }
                     },
                     left: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.4, green: 0.4, blue: 0.4 }
+                        color: { red: 0, green: 0.4, blue: 0.8 }
                     },
                     right: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.4, green: 0.4, blue: 0.4 }
+                        color: { red: 0, green: 0.4, blue: 0.8 }
                     },
                     innerVertical: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.6, green: 0.6, blue: 0.6 }
+                        color: { red: 0, green: 0.4, blue: 0.8 }
                     }
                 }
             });
             
-            // Agregar bordes sutiles a todas las celdas de datos
+            // Agregar bordes sutiles a todas las celdas de datos (celeste claro)
             requests.push({
                 updateBorders: {
                     range: {
@@ -283,35 +305,71 @@ async function guardarEnGoogleSheets(datos) {
                     top: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.9, green: 0.9, blue: 0.9 }
+                        color: { red: 0.8, green: 0.92, blue: 1 }
                     },
                     bottom: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.9, green: 0.9, blue: 0.9 }
+                        color: { red: 0.8, green: 0.92, blue: 1 }
                     },
                     left: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.9, green: 0.9, blue: 0.9 }
+                        color: { red: 0.8, green: 0.92, blue: 1 }
                     },
                     right: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.9, green: 0.9, blue: 0.9 }
+                        color: { red: 0.8, green: 0.92, blue: 1 }
                     },
                     innerHorizontal: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.9, green: 0.9, blue: 0.9 }
+                        color: { red: 0.8, green: 0.92, blue: 1 }
                     },
                     innerVertical: {
                         style: 'SOLID',
                         width: 1,
-                        color: { red: 0.9, green: 0.9, blue: 0.9 }
+                        color: { red: 0.8, green: 0.92, blue: 1 }
                     }
                 }
             });
+            
+            // Colores alternados (banding) - celeste muy suave RegresoFeliz
+            requests.push({
+                addBanding: {
+                    bandedRange: {
+                        range: {
+                            sheetId: 0,
+                            startRowIndex: 0,
+                            startColumnIndex: 0,
+                            endColumnIndex: 29
+                        },
+                        rowProperties: {
+                            // Fila par - blanco
+                            firstBandColor: { red: 1, green: 1, blue: 1 },
+                            // Fila impar - celeste muy suave (#F0F9FF)
+                            secondBandColor: { red: 0.941, green: 0.976, blue: 1 }
+                        }
+                    }
+                }
+            });
+            
+            // Filtro automático en toda la tabla
+            if (necesitaFiltro) {
+                requests.push({
+                    setBasicFilter: {
+                        filter: {
+                            range: {
+                                sheetId: 0,
+                                startRowIndex: 0,
+                                startColumnIndex: 0,
+                                endColumnIndex: 29
+                            }
+                        }
+                    }
+                });
+            }
             
             // Configurar texto ajustado (wrap) para la columna del mensaje (AB = columna 27)
             requests.push({
@@ -412,8 +470,20 @@ async function guardarEnGoogleSheets(datos) {
     }
 }
 
-// Middlewares
-app.use(cors());
+// Middlewares - CORS explícito para permitir regresofeliz.com
+app.use(cors({
+    origin: [
+        'https://regresofeliz.com',
+        'https://www.regresofeliz.com',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:5500',
+        'http://127.0.0.1:5500'
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true
+}));
 
 // Middleware para loggear todas las peticiones
 app.use((req, res, next) => {

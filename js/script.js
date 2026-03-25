@@ -147,11 +147,18 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Ocultar loading del mapa
     mostrarMapaLoading(false);
     
-    // Inicializar componentes del formulario
-    inicializarMapa();
-    configurarAutocompletado();
+    // Inicializar componentes del formulario (solo si Google Maps cargó)
+    if (window.google && window.google.maps) {
+        inicializarMapa();
+        configurarAutocompletado();
+        configurarToggleMapa();
+    } else {
+        const mapDiv = document.getElementById('map');
+        if (mapDiv) {
+            mapDiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#e74c3c;font-size:14px;text-align:center;padding:20px;">⚠️ No se pudo cargar el mapa. Recarga la página para intentar de nuevo.</div>';
+        }
+    }
     configurarActualizacionResumen();
-    configurarToggleMapa();
     configurarParadasAdicionales();
 });
 
