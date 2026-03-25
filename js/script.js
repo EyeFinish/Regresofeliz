@@ -55,8 +55,8 @@ let placesService = null;
 let directionsService = null;
 
 // Constantes de precio
-const PRECIO_BASE = 25000;
-const COSTO_POR_KM = 600;
+const PRECIO_BASE = 30000;
+const COSTO_POR_KM = 700;
 const COSTO_PARADA_ADICIONAL = 2000;
 
 // Obtener elementos del DOM
@@ -75,13 +75,35 @@ function cargarGoogleMaps(apiKey) {
             return;
         }
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=es&region=CL`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=es&region=CL&loading=async`;
         script.async = true;
         script.defer = true;
         script.onload = resolve;
         script.onerror = () => reject(new Error('No se pudo cargar Google Maps'));
         document.head.appendChild(script);
     });
+}
+
+// Mostrar/ocultar loading del mapa
+function mostrarMapaLoading(show) {
+    const mapDiv = document.getElementById('map');
+    if (!mapDiv) return;
+    let loader = document.getElementById('map-loading');
+    if (show) {
+        if (!loader) {
+            loader = document.createElement('div');
+            loader.id = 'map-loading';
+            loader.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f0f0f0;z-index:10;border-radius:12px;';
+            loader.innerHTML = '<div style="border:4px solid #e0e0e0;border-top:4px solid #667eea;border-radius:50%;width:40px;height:40px;animation:spinMap 0.8s linear infinite;"></div><p style="margin-top:12px;color:#666;font-size:14px;">Cargando mapa...</p>';
+            const style = document.createElement('style');
+            style.textContent = '@keyframes spinMap{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}';
+            document.head.appendChild(style);
+        }
+        mapDiv.style.position = 'relative';
+        mapDiv.appendChild(loader);
+    } else {
+        if (loader) loader.remove();
+    }
 }
 
 // Botón volver al inicio (solo en index.html)
@@ -94,14 +116,26 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
     
-    // Obtener API Key desde el backend y cargar Google Maps
+    // Mostrar loading en el mapa mientras carga
+    mostrarMapaLoading(true);
+    
+    // Obtener API Key usando la promesa pre-iniciada en el <head> (o fallback)
     try {
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_URL = isLocal ? 'http://localhost:3000' : 'https://regresofeliz.onrender.com';
-        const resp = await fetch(`${API_URL}/api/maps-key`);
-        const data = await resp.json();
-        if (data.ok && data.key) {
-            GOOGLE_MAPS_KEY = data.key;
+        let apiKey;
+        if (window.__gmapsKeyPromise) {
+            apiKey = await window.__gmapsKeyPromise;
+        } else {
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const API_URL = isLocal ? 'http://localhost:3000' : 'https://regresofeliz.onrender.com';
+            const resp = await fetch(`${API_URL}/api/maps-key`);
+            const data = await resp.json();
+            if (data.ok && data.key) {
+                apiKey = data.key;
+            }
+        }
+        
+        if (apiKey) {
+            GOOGLE_MAPS_KEY = apiKey;
             await cargarGoogleMaps(GOOGLE_MAPS_KEY);
         } else {
             console.error('No se pudo obtener la API Key de Google Maps');
@@ -109,6 +143,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (error) {
         console.error('Error al cargar Google Maps:', error);
     }
+    
+    // Ocultar loading del mapa
+    mostrarMapaLoading(false);
     
     // Inicializar componentes del formulario
     inicializarMapa();

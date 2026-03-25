@@ -31,8 +31,38 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/logo-regresofeliz.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/logo-regresofeliz.png">
     
+    <!-- Preconnect to critical domains for faster loading -->
+    <link rel="preconnect" href="https://regresofeliz.onrender.com">
+    <link rel="preconnect" href="https://maps.googleapis.com">
+    <link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
+    
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/mobile.css">
+    
+    <!-- Pre-fetch API key lo antes posible para evitar espera del cold start -->
+    <script>
+    (function() {
+        var cached = sessionStorage.getItem('gmaps_key');
+        var cachedTime = sessionStorage.getItem('gmaps_key_time');
+        var ONE_HOUR = 3600000;
+        if (cached && cachedTime && (Date.now() - parseInt(cachedTime)) < ONE_HOUR) {
+            window.__gmapsKeyPromise = Promise.resolve(cached);
+        } else {
+            var apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+                ? 'http://localhost:3000' : 'https://regresofeliz.onrender.com';
+            window.__gmapsKeyPromise = fetch(apiUrl + '/api/maps-key')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.ok && data.key) {
+                        sessionStorage.setItem('gmaps_key', data.key);
+                        sessionStorage.setItem('gmaps_key_time', Date.now().toString());
+                        return data.key;
+                    }
+                    throw new Error('No key');
+                });
+        }
+    })();
+    </script>
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VY2EEL1FJ6"></script>
@@ -271,7 +301,7 @@
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     
-    <script src="js/script.js?v=20260104"></script>
+    <script src="js/script.js?v=20260325"></script>
     
     <script>
 // Solo permitir acceso si viene desde inicio.html
