@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             apiKey = await window.__gmapsKeyPromise;
         } else {
             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const API_URL = isLocal ? 'http://localhost:3000' : 'https://regresofeliz.onrender.com';
+            const API_URL = isLocal ? 'http://localhost:3000' : 'https://regresofeliz-3u02.onrender.com';
             const resp = await fetch(`${API_URL}/api/maps-key`);
             const data = await resp.json();
             if (data.ok && data.key) {
@@ -1028,7 +1028,7 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         
         const API_URL = isLocal 
             ? 'http://localhost:3000' 
-            : 'https://regresofeliz.onrender.com';
+            : 'https://regresofeliz-3u02.onrender.com';
         // Enviar datos al backend
         const response = await fetch(`${API_URL}/api/cotizacion`, {
             method: 'POST',

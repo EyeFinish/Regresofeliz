@@ -32,7 +32,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="assets/logo-regresofeliz.png">
     
     <!-- Preconnect to critical domains for faster loading -->
-    <link rel="preconnect" href="https://regresofeliz.onrender.com">
+    <link rel="preconnect" href="https://regresofeliz-3u02.onrender.com">
     <link rel="preconnect" href="https://maps.googleapis.com">
     <link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
     
@@ -49,7 +49,7 @@
             window.__gmapsKeyPromise = Promise.resolve(cached);
         } else {
             var apiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-                ? 'http://localhost:3000' : 'https://regresofeliz.onrender.com';
+                ? 'http://localhost:3000' : 'https://regresofeliz-3u02.onrender.com';
             function fetchKey(retries) {
                 return fetch(apiUrl + '/api/maps-key')
                     .then(function(r) { return r.json(); })
