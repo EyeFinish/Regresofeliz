@@ -42,14 +42,25 @@ async function getGoogleSheetsClient() {
 
 // Función para crear el mensaje de cotización formateado
 function crearMensajeCotizacion(datos) {
-    const descuentoTexto = datos.descuentoAplicado > 0 
-        ? `🎉 *DESCUENTO APLICADO*: -$${datos.descuentoAplicado.toLocaleString('es-CL')} (Código: ${datos.codigoDescuento})\n` 
+    const costoParadasMonto = (datos.numParadas || 0) * 2000;
+    const costoSubtotal = datos.costoBase + costoParadasMonto;
+
+    const descuentoTexto = datos.descuentoAplicado > 0
+        ? `🎉 *DESCUENTO APLICADO*: -$${datos.descuentoAplicado.toLocaleString('es-CL')} (Código: ${datos.codigoDescuento})\n`
         : '';
-    
-    const paradasTexto = datos.numParadas > 0 
-        ? `🛑 *Paradas adicionales*: ${datos.numParadas} ($${(datos.numParadas * 2000).toLocaleString('es-CL')})\n   ${datos.paradasAdicionales}\n\n` 
+
+    const paradasTexto = datos.numParadas > 0
+        ? `🛑 *Paradas adicionales*: ${datos.numParadas}\n   ${datos.paradasAdicionales}\n\n`
         : '';
-    
+
+    const paradasCostoTexto = datos.numParadas > 0
+        ? `🛑 *Paradas (${datos.numParadas})*: +$${costoParadasMonto.toLocaleString('es-CL')}\n`
+        : '';
+
+    const subtotalTexto = (datos.numParadas > 0 || datos.descuentoAplicado > 0)
+        ? `📊 *Subtotal*: $${costoSubtotal.toLocaleString('es-CL')}\n`
+        : '';
+
     const mensaje = `
 🎉 *¡Hola ${datos.nombre.split(' ')[0]}!* 🎉
 
@@ -74,8 +85,8 @@ ${paradasTexto}📏 *Distancia*: ${datos.distanciaKm} km
 🛡️ *Seguro*: ${datos.seguro}
 
 💰 *COTIZACIÓN*
-💵 *Costo base*: $${datos.costoBase.toLocaleString('es-CL')}
-${descuentoTexto}✅ *TOTAL A PAGAR*: *$${datos.costoFinal.toLocaleString('es-CL')}*
+💵 *Tarifa ruta*: $${datos.costoBase.toLocaleString('es-CL')}
+${paradasCostoTexto}${subtotalTexto}${descuentoTexto}✅ *TOTAL A PAGAR*: *$${datos.costoFinal.toLocaleString('es-CL')}*
 
 📞 *CONTACTO*
 ${datos.telefono}${datos.telefono2 ? `\n📱 Emergencia: ${datos.telefono2}` : ''}
@@ -438,21 +449,24 @@ async function guardarEnGoogleSheets(datos) {
                 });
             });
             
-            await sheets.spreadsheets.batchUpdate({
-                spreadsheetId: SPREADSHEET_ID,
-                resource: { requests }
-            });
-            
-            console.log('✅ Formato aplicado a encabezados');
+            try {
+                await sheets.spreadsheets.batchUpdate({
+                    spreadsheetId: SPREADSHEET_ID,
+                    resource: { requests }
+                });
+                console.log('✅ Formato aplicado a encabezados');
+            } catch (formatError) {
+                console.warn('⚠️ Error al aplicar formato (los datos se guardarán igual):', formatError.message);
+            }
         } else {
             console.log('ℹ️ Encabezados ya están completos, no se necesita actualización');
         }
-        
-        // Agregar nueva fila al final
+
+        // Agregar nueva fila al final (siempre se ejecuta, independiente del formato)
         console.log('📝 Guardando fila con ' + fila.length + ' columnas en Google Sheets...');
         console.log('📱 Mensaje generado: ' + (mensajeCotizacion ? 'SÍ (' + mensajeCotizacion.length + ' caracteres)' : 'NO'));
         console.log('🔗 Link WhatsApp: ' + linkWhatsApp);
-        
+
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
             range: 'A:AC',

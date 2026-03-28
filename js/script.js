@@ -750,6 +750,7 @@ async function calcularRuta() {
             
             // Guardar valores solo en variables globales para WhatsApp
             window._cotizacion_costo = costoTotal;
+            window._cotizacion_costo_base = Math.floor(costoBase / 1000) * 1000 - 10; // tarifa ruta sin paradas
             window._cotizacion_distancia = distanciaKm;
             window._cotizacion_duracion = duracionMin;
             window._cotizacion_num_paradas = paradasValidas.length;
@@ -1012,7 +1013,7 @@ document.getElementById('reservaForm').addEventListener('submit', async function
         seguro: seguro,
         distanciaKm: window._cotizacion_distancia || '',
         duracionMin: window._cotizacion_duracion || '',
-        costoBase: costoOriginal,
+        costoBase: Math.round(window._cotizacion_costo_base || 0),
         costoFinal: costoFinal,
         codigoDescuento: codigoDescuento,
         descuentoAplicado: descuento
